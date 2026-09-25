@@ -1,0 +1,26 @@
+{
+  "name": "Taipei LANY Trip Console 2026",
+  "short_name": "台北 LANY",
+  "description": "Edward 的台北 LANY 行程、VIP 時間、離線路線與線上導航。",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f5f8ff",
+  "theme_color": "#5272ee",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

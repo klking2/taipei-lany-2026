@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="zh-Hant" data-ha-style="soft-saas">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#5272ee">
+  <meta name="description" content="Edward 的台北 LANY 2026 手機行程、VIP 時間、離線路線圖與 Google Maps 導航。">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="台北 LANY">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <title>Taipei LANY Trip Console 2026</title>
+  <style>
+    :root {
+      --ink:#172039; --muted:#68738c; --line:#dce6f5; --paper:#fff;
+      --blue:#5272ee; --blue-soft:#edf2ff; --cyan:#5bc8c4; --mint:#eaf9f4;
+      --pink:#ee8cab; --pink-soft:#fff0f5; --amber:#f0b45b; --amber-soft:#fff8e8;
+      --green:#238267; --danger:#ab4050; --shadow:0 18px 48px rgba(39,59,103,.11);
+      --radius:24px;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; min-width:320px; color:var(--ink); background:linear-gradient(145deg,#f5f8ff 0%,#fff8fb 48%,#f2fbf8 100%); font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif; }
+    button,input,textarea,select { font:inherit; }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    a { color:inherit; }
+    .shell { width:min(1220px,calc(100% - 28px)); margin:auto; padding:24px 0 80px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:14px; }
+    .brand { display:flex; align-items:center; gap:13px; }
+    .brandmark { width:46px; height:46px; border-radius:16px; display:grid; place-items:center; color:white; background:linear-gradient(145deg,var(--blue),#8c75f7); box-shadow:0 12px 24px rgba(82,114,238,.25); font-size:22px; font-weight:900; }
+    .brand strong { display:block; font-size:22px; letter-spacing:-.02em; }
+    .brand span { display:block; color:var(--muted); font-size:14px; }
+    .trip-switch,.top-actions,.quick-nav,.filter-row,.toolbar { display:flex; flex-wrap:wrap; gap:9px; align-items:center; }
+    .button,.trip-switch a,.quick-nav a { min-height:42px; display:inline-flex; align-items:center; justify-content:center; padding:0 14px; border:1px solid var(--line); border-radius:13px; background:rgba(255,255,255,.84); color:#43506d; text-decoration:none; font-weight:800; cursor:pointer; }
+    .trip-switch a.active,.button.primary { border-color:transparent; color:#fff; background:var(--blue); }
+    .system-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; padding:12px 15px; border:1px solid #d9e5ff; border-radius:14px; background:#f7faff; color:#4d63bd; font-weight:800; }
+    .system-bar[data-state="saved"] { border-color:#ccefe2; background:#effbf7; color:var(--green); }
+    .system-bar[data-state="error"] { border-color:#f6c7ca; background:#fff2f3; color:var(--danger); }
+    .system-bar button { min-height:36px; padding:0 12px; border:1px solid currentColor; border-radius:10px; background:#fff; color:inherit; font-weight:800; cursor:pointer; }
+    .connection { display:inline-flex; align-items:center; gap:7px; min-height:38px; padding:0 12px; border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--muted); font-size:14px; font-weight:850; }
+    .connection:before { content:""; width:9px; height:9px; border-radius:50%; background:#99a3b7; }
+    .connection.online:before { background:#27a77b; box-shadow:0 0 0 4px #e7f8f1; }
+    .connection.offline:before { background:#e09b32; box-shadow:0 0 0 4px #fff4df; }
+    .install-help { display:none; margin:0 0 14px; padding:14px 16px; border:1px solid #d7e2ff; border-radius:16px; background:#f7f9ff; color:#52617f; }
+    .install-help.show { display:block; }
+    .quick-nav { margin-bottom:18px; }
+    .quick-nav a { min-height:38px; padding:0 12px; font-size:14px; }
+    .board { display:grid; grid-template-columns:1.05fr 1.25fr .9fr; gap:16px; align-items:stretch; }
+    .panel { background:rgba(255,255,255,.9); border:1px solid rgba(218,228,244,.92); border-radius:var(--radius); box-shadow:var(--shadow); }
+    .profile-card,.hero-card,.alert-card { padding:24px; }
+    .eyebrow { margin:0 0 8px; color:var(--blue); font-size:13px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { margin-bottom:10px; font-size:clamp(30px,4vw,48px); line-height:1.05; letter-spacing:-.045em; }
+    h2 { font-size:24px; letter-spacing:-.025em; }
+    h3 { font-size:18px; }
+    .lead { color:var(--muted); font-size:17px; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin:17px 0; }
+    .chip { padding:7px 10px; border-radius:999px; background:var(--blue-soft); color:#4d63bd; font-size:14px; font-weight:850; }
+    .chip.done { background:var(--mint); color:var(--green); }
+    .chip.warn { background:var(--amber-soft); color:#9b681f; }
+    .fact-list { display:grid; gap:9px; margin-top:18px; }
+    .fact { display:grid; grid-template-columns:10px 1fr auto; gap:10px; align-items:center; padding:10px 0; border-top:1px solid #edf1f7; }
+    .fact i { width:9px; height:9px; border-radius:50%; background:var(--blue); }
+    .fact small { color:var(--muted); font-size:14px; }
+    .hero-card { position:relative; overflow:hidden; color:white; background:linear-gradient(145deg,#526ee5,#7c6fea 52%,#b074de); }
+    .hero-card:after { content:""; position:absolute; width:270px; height:270px; border-radius:50%; right:-90px; bottom:-130px; background:rgba(255,255,255,.12); }
+    .hero-card .eyebrow { color:#dce6ff; }
+    .hero-card p { color:#eef2ff; }
+    .date-bloom { display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center; margin:22px 0; }
+    .date-orb { width:118px; height:118px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.17); border:1px solid rgba(255,255,255,.38); }
+    .date-orb strong { display:block; font-size:34px; line-height:1; }
+    .date-orb span { font-size:13px; }
+    .metric strong { display:block; font-size:28px; }
+    .metric span { color:#e9edff; }
+    .hero-actions { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:9px; }
+    .hero-actions a { min-height:42px; display:inline-flex; align-items:center; padding:0 14px; border-radius:13px; text-decoration:none; font-weight:900; background:white; color:#465ec8; }
+    .hero-actions a.secondary { color:#fff; border:1px solid rgba(255,255,255,.42); background:rgba(255,255,255,.1); }
+    .alert-card { display:flex; flex-direction:column; justify-content:space-between; background:linear-gradient(180deg,#fff,#fff9eb); }
+    .alert-card .number { font-size:48px; font-weight:950; letter-spacing:-.05em; color:#d18a25; }
+    .alert-card ul { padding-left:20px; margin:8px 0 20px; color:#6d5c43; }
+    .activity-strip { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:15px; }
+    .activity-strip article { padding:14px; border-radius:17px; background:#f7f9fd; }
+    .activity-strip b { display:block; margin-bottom:4px; font-size:17px; }
+    .activity-strip span { color:var(--muted); font-size:14px; }
+    .section { margin-top:20px; padding:24px; }
+    .section-head { display:flex; justify-content:space-between; gap:16px; align-items:flex-end; margin-bottom:18px; }
+    .section-head p { margin:0; color:var(--muted); }
+    .task-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .task { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:start; padding:16px; border:1px solid var(--line); border-radius:18px; background:#fbfcff; }
+    .task input { width:22px; height:22px; accent-color:var(--blue); }
+    .task b { display:block; font-size:17px; }
+    .task p { margin:3px 0 0; color:var(--muted); font-size:14px; }
+    .priority { padding:5px 8px; border-radius:999px; color:#8b641e; background:var(--amber-soft); font-size:12px; font-weight:900; }
+    .task.complete { opacity:.67; background:#f3fbf7; }
+    .task.complete .priority { color:var(--green); background:var(--mint); }
+    .timeline-shell { display:grid; grid-template-columns:280px 1fr; gap:18px; }
+    .day-nav { display:grid; gap:10px; align-content:start; }
+    .day-button { text-align:left; padding:14px; border:1px solid var(--line); border-radius:17px; background:#fff; cursor:pointer; }
+    .day-button.active { color:#fff; background:var(--blue); border-color:var(--blue); }
+    .day-button strong,.day-button span { display:block; }
+    .day-button span { opacity:.78; font-size:14px; }
+    .day-view { min-width:0; }
+    .day-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; border-radius:18px; background:var(--blue-soft); }
+    .day-summary p { margin:3px 0 0; color:#56668b; }
+    .progress { width:110px; height:9px; border-radius:99px; background:#dfe7fb; overflow:hidden; }
+    .progress i { display:block; height:100%; background:linear-gradient(90deg,var(--blue),var(--cyan)); }
+    .timeline { margin-top:14px; display:grid; gap:10px; }
+    .stop { display:grid; grid-template-columns:82px 16px 1fr auto; gap:10px; align-items:start; padding:15px; border:1px solid var(--line); border-radius:18px; background:#fff; }
+    .stop time { font-weight:900; color:#4d63bd; }
+    .stop .dot { width:12px; height:12px; margin-top:6px; border-radius:50%; background:var(--blue); box-shadow:0 0 0 5px var(--blue-soft); }
+    .stop[data-kind="show"] .dot { background:var(--pink); box-shadow:0 0 0 5px var(--pink-soft); }
+    .stop[data-kind="hotel"] .dot { background:var(--cyan); box-shadow:0 0 0 5px #e7faf9; }
+    .stop b { display:block; font-size:17px; }
+    .stop p { margin:3px 0 0; color:var(--muted); font-size:14px; }
+    .kind { padding:4px 8px; border-radius:999px; background:#f0f3f8; color:#5c6780; font-size:12px; font-weight:900; }
+    .toolbar { margin-bottom:14px; }
+    .toolbar input,.toolbar select { min-height:42px; padding:0 12px; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--ink); }
+    .toolbar input { flex:1; min-width:220px; }
+    .map-grid { display:grid; grid-template-columns:1.65fr .85fr; gap:16px; }
+    .map-frame { min-height:540px; border:0; border-radius:20px; width:100%; background:#eef2f8; }
+    .map-list { display:grid; gap:10px; align-content:start; }
+    .map-list article { padding:14px; border:1px solid var(--line); border-radius:16px; background:#fbfcff; }
+    .map-list b { display:block; }
+    .map-list span { color:var(--muted); font-size:14px; }
+    .map-links { display:grid; gap:8px; margin-top:14px; }
+    .map-links a { padding:10px 12px; border-radius:12px; background:var(--blue-soft); color:#4d63bd; text-decoration:none; font-weight:850; }
+    .map-mode { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
+    .map-mode button { min-height:44px; padding:0 15px; border:1px solid var(--line); border-radius:13px; background:#fff; color:#53617f; font-weight:900; cursor:pointer; }
+    .map-mode button.active { border-color:transparent; color:#fff; background:var(--blue); }
+    .map-panel[hidden] { display:none; }
+    .route-board { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .route-day { padding:18px; border:1px solid var(--line); border-radius:20px; background:#fbfcff; }
+    .route-day h3 { margin:0 0 4px; }
+    .route-day > p { color:var(--muted); }
+    .route-list { list-style:none; margin:16px 0 0; padding:0; counter-reset:route; }
+    .route-list li { position:relative; display:grid; grid-template-columns:34px 1fr; gap:10px; min-height:70px; }
+    .route-list li:before { counter-increment:route; content:counter(route); position:relative; z-index:1; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; color:#fff; background:var(--blue); font-size:13px; font-weight:950; }
+    .route-list li:not(:last-child):after { content:""; position:absolute; top:28px; left:14px; width:2px; height:46px; background:#cfd9f3; }
+    .route-list b,.route-list span { display:block; }
+    .route-list span { color:var(--muted); font-size:14px; }
+    .route-list a { display:inline-flex; margin-top:5px; color:#4d63bd; font-size:14px; font-weight:850; text-decoration:none; }
+    .offline-note { margin:14px 0 0; padding:12px 14px; border-radius:14px; background:var(--amber-soft); color:#785b2a; font-size:14px; }
+    .offline-pack { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+    .offline-pack article { padding:14px; border-radius:16px; background:#f3f6ff; }
+    .offline-pack b,.offline-pack span { display:block; }
+    .offline-pack span { margin-top:3px; color:var(--muted); font-size:14px; }
+    .nightlife-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .nightlife-card { position:relative; padding:18px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#fff 0%,#f8f9ff 100%); overflow:hidden; }
+    .nightlife-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:#cbd4ea; }
+    .nightlife-card.featured::before { background:linear-gradient(180deg,var(--pink),var(--blue)); }
+    .nightlife-card h3 { margin:7px 0 5px; font-size:20px; }
+    .nightlife-card p { margin:6px 0; color:var(--muted); }
+    .nightlife-card a { display:inline-flex; margin-top:8px; color:#4d63bd; font-weight:850; text-decoration:none; }
+    .nightlife-meta { font-size:14px; font-weight:800; color:#53617f!important; }
+    .nightlife-tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+    .nightlife-tag { padding:5px 9px; border-radius:999px; background:var(--blue-soft); color:#5267bd; font-size:12px; font-weight:900; }
+    .nightlife-note { margin:14px 0 0; padding:13px 15px; border-radius:14px; background:#fff7ee; color:#775b3e; font-size:14px; }
+    .vip-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .vip-card { padding:18px; border:1px solid #ead9b3; border-radius:18px; background:linear-gradient(145deg,#fffdf7,#fff8e8); }
+    .vip-card h3 { margin:6px 0 10px; font-size:20px; }
+    .vip-time { display:grid; grid-template-columns:110px 1fr; gap:8px; padding:9px 0; border-top:1px solid rgba(175,132,58,.16); }
+    .vip-time b { color:#9b681f; }
+    .vip-checklist { margin:14px 0 0; padding:14px 16px; border-radius:14px; background:#f3f6ff; color:#4f5f83; }
+    .vip-checklist strong { color:#344d9f; }
+    .map-private-note { margin:0 0 12px; padding:12px 14px; border-radius:14px; background:#f3f5fb; color:#59657f; font-size:14px; }
+    textarea { width:100%; min-height:220px; padding:16px; resize:vertical; border:1px solid var(--line); border-radius:16px; background:#fbfcff; color:var(--ink); }
+    .source-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .source-grid a { display:block; padding:16px; border:1px solid var(--line); border-radius:16px; background:#fbfcff; text-decoration:none; }
+    .source-grid b { display:block; color:#4d63bd; }
+    .source-grid span { color:var(--muted); font-size:14px; }
+    dialog { width:min(820px,calc(100% - 24px)); max-height:88vh; border:0; border-radius:22px; padding:0; box-shadow:0 28px 80px rgba(20,35,70,.25); }
+    dialog::backdrop { background:rgba(28,36,55,.5); backdrop-filter:blur(4px); }
+    .dialog-head,.dialog-foot { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; border-bottom:1px solid var(--line); }
+    .dialog-foot { border-top:1px solid var(--line); border-bottom:0; }
+    .dialog-body { padding:20px; overflow:auto; max-height:65vh; }
+    .edit-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .field { display:grid; gap:5px; }
+    .field.full { grid-column:1/-1; }
+    .field label { color:var(--muted); font-size:13px; font-weight:800; }
+    .field input,.field textarea,.field select { width:100%; min-height:42px; padding:9px 11px; border:1px solid var(--line); border-radius:11px; background:#fff; }
+    .edit-item { display:grid; grid-template-columns:100px 1fr 1.3fr 110px auto; gap:8px; margin-top:10px; }
+    .edit-item input,.edit-item select { min-width:0; padding:8px; border:1px solid var(--line); border-radius:10px; }
+    .remove { border:0; border-radius:10px; color:var(--danger); background:#fff0f2; font-weight:900; cursor:pointer; }
+    .toast { position:fixed; right:18px; bottom:18px; z-index:20; max-width:360px; padding:12px 15px; border-radius:14px; color:#fff; background:#2c3956; box-shadow:var(--shadow); opacity:0; transform:translateY(12px); pointer-events:none; transition:.2s; }
+    .toast.show { opacity:1; transform:none; }
+    @media (max-width:930px) {
+      .board { grid-template-columns:1fr 1fr; }
+      .alert-card { grid-column:1/-1; }
+      .activity-strip { grid-template-columns:repeat(2,1fr); }
+      .map-grid,.timeline-shell { grid-template-columns:1fr; }
+      .day-nav { grid-template-columns:repeat(4,1fr); }
+      .source-grid { grid-template-columns:1fr; }
+    }
+    @media (max-width:650px) {
+      body { font-size:17px; }
+      .shell { width:min(100% - 18px,1220px); padding-top:12px; }
+      .topbar,.section-head,.system-bar { align-items:stretch; flex-direction:column; }
+      .trip-switch { width:100%; }
+      .trip-switch a { flex:1; }
+      .board,.task-grid,.activity-strip,.edit-grid { grid-template-columns:1fr; }
+      .activity-strip,.alert-card { grid-column:auto; }
+      .day-nav { grid-template-columns:1fr 1fr; }
+      .nightlife-grid { grid-template-columns:1fr; }
+      .vip-grid { grid-template-columns:1fr; }
+      .route-board,.offline-pack { grid-template-columns:1fr; }
+      .section,.profile-card,.hero-card,.alert-card { padding:18px; }
+      .stop { grid-template-columns:72px 12px 1fr; }
+      .kind { grid-column:3; justify-self:start; }
+      .edit-item { grid-template-columns:1fr; padding:12px; border:1px solid var(--line); border-radius:14px; }
+    }
+    @media print {
+      body { background:#fff; }
+      .shell { width:100%; padding:0; }
+      .top-actions,.trip-switch,.system-bar button,.quick-nav,.toolbar,.button,.dialog,.toast { display:none!important; }
+      .panel { box-shadow:none; break-inside:avoid; }
+      .map-frame { min-height:360px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brandmark" aria-hidden="true">TW</span>
+        <div><strong>Taipei LANY Trip Console</strong><span>手機版 · 線上導航＋離線行程 · 更新 2026-09-25</span></div>
+      </div>
+      <div class="top-actions">
+        <span class="connection" id="connection-state">檢查網絡</span>
+        <button class="button primary" id="install-app" type="button">加到手機主畫面</button>
+      </div>
+    </header>
+
+    <div class="install-help" id="install-help" role="status">
+      <strong>iPhone 安裝：</strong>用 Safari 開啟本頁 → 按底部「分享」→「加入主畫面」。第一次請在有網絡時完整打開一次，之後離線仍可看行程及路線卡。
+    </div>
+
+    <div class="system-bar" id="system-bar" data-state="loading" role="status" aria-live="polite">
+      <span id="system-message">正在準備手機行程資料…</span>
+      <button id="reload-system" type="button">重新載入</button>
+    </div>
+    <nav class="quick-nav" aria-label="快速前往">
+      <a href="#tasks">待辦</a><a href="#vip-guide">VIP 入場</a><a href="#itinerary">逐日行程</a><a href="#nightlife">飯後輕酌</a><a href="#trip-map">線上／離線地圖</a><a href="#trip-notes">備註</a><a href="#sources">官方資料</a>
+    </nav>
+
+    <section class="board" aria-label="台北 LANY 旅程總覽">
+      <article class="profile-card panel">
+        <p class="eyebrow">Taipei · 4 days</p>
+        <h1>台北 · LANY</h1>
+        <p class="lead">9 月 25 日深夜出發，26 日凌晨抵達；同日到台北小巨蛋看 LANY。</p>
+        <div class="chips"><span class="chip done">台證已完成</span><span class="chip done">LANY VIP</span><span class="chip">酒店：天閣台北復興</span><span class="chip warn">VIP 種類待確認</span></div>
+        <div class="fact-list">
+          <div class="fact"><i></i><div><b>去程 HB710</b><small>HKG T2 → TPE T1</small></div><strong>9/25 23:55</strong></div>
+          <div class="fact"><i style="background:var(--pink)"></i><div><b>LANY: soft world tour · VIP</b><small>台北小巨蛋</small></div><strong>9/26 19:30</strong></div>
+          <div class="fact"><i style="background:var(--cyan)"></i><div><b>回程 HB707</b><small>TPE T1 → HKG T1</small></div><strong>9/27 23:45</strong></div>
+        </div>
+      </article>
+
+      <article class="hero-card panel">
+        <p class="eyebrow">Primary event</p>
+        <h2>LANY: soft world tour</h2>
+        <p>官方已確認 19:30 開演；你是 VIP，14:00 起可報到及優先購買周邊。整隊時間按 VIP 種類而定。</p>
+        <div class="date-bloom">
+          <div class="date-orb"><div><strong>26</strong><span>SEP 2026 · SAT</span></div></div>
+          <div class="metric"><strong>台北小巨蛋</strong><span>南京東路四段 2 號 · 捷運小巨蛋站 2 號出口</span></div>
+        </div>
+        <div class="hero-actions">
+          <a href="https://www.livenation.com.tw/lany-tpe26" target="_blank" rel="noreferrer">VIP 入場辦法</a>
+          <a class="secondary" href="https://tixcraft.com/" target="_blank" rel="noreferrer">拓元售票</a>
+        </div>
+      </article>
+
+      <article class="alert-card panel">
+        <div>
+          <p class="eyebrow">Need attention</p>
+          <div class="number" id="open-count">5</div>
+          <h2>未完成事項</h2>
+          <ul><li>確認 VIP 是 Last Forever 或 Soft</li><li>凌晨機場接送未選</li><li>酒店訂房資料仍待補</li></ul>
+        </div>
+        <a class="button primary" href="#tasks">立即處理待辦</a>
+      </article>
+
+      <div class="activity-strip panel">
+        <article><b>01:55 抵台</b><span>9/26 · 桃園機場 T1</span></article>
+        <article><b>凌晨接送</b><span>機捷未開 · 接送／的士優先</span></article>
+        <article><b>14:00 VIP 報到</b><span>小巨蛋 2 號入口旁 · 同時可優先買周邊</span></article>
+        <article><b>23:45 回港</b><span>9/27 HB707 · 最新時間已確認</span></article>
+      </div>
+    </section>
+
+    <section class="section panel" id="tasks">
+      <div class="section-head"><div><p class="eyebrow">Action queue</p><h2>出發前待辦</h2><p>打勾後會儲存在這部手機；離線亦可修改，清除瀏覽器資料前請不要刪除網站資料。</p></div></div>
+      <div class="task-grid" id="task-grid"></div>
+    </section>
+
+    <section class="section panel" id="vip-guide">
+      <div class="section-head">
+        <div><p class="eyebrow">VIP access plan</p><h2>LANY VIP 入場時間線</h2><p>你已確認是 VIP；現時只欠票券上寫的是哪一個套票名稱。兩種流程已並列，避免用錯整隊時間。</p></div>
+        <a class="button primary" href="https://www.livenation.com.tw/lany-tpe26" target="_blank" rel="noreferrer">官方入場辦法</a>
+      </div>
+      <div class="vip-grid">
+        <article class="vip-card">
+          <span class="chip warn">VIP A</span>
+          <h3>The Last Forever Fan Experience</h3>
+          <div class="vip-time"><b>14:00–15:00</b><span>VIP 周邊優先購</span></div>
+          <div class="vip-time"><b>14:00 起</b><span>在小巨蛋 2 號入口旁報到，最遲須在 VIP 活動前完成</span></div>
+          <div class="vip-time"><b>15:50</b><span>依 VIP 票券／Upgrade 序號到場域圖指定位置整隊</span></div>
+        </article>
+        <article class="vip-card">
+          <span class="chip">VIP B</span>
+          <h3>The Soft VIP Package</h3>
+          <div class="vip-time"><b>14:00–15:00</b><span>VIP 周邊優先購</span></div>
+          <div class="vip-time"><b>14:00–16:50</b><span>在小巨蛋 2 號入口旁完成 VIP 報到</span></div>
+          <div class="vip-time"><b>16:50</b><span>依 VIP 票券／Upgrade 序號到場域圖指定位置整隊</span></div>
+        </article>
+      </div>
+      <div class="vip-checklist"><strong>當日必帶：</strong>VIP 票券；如屬 VIP Upgrade，須同時出示演唱會票券及 Upgrade 票券。報到後會戴手環及在演唱會票券蓋「已兌換」章。福利及 VIP 禮只限當日領取，不寄送；逾時會視作放棄。包袋不可超過 37 × 25 × 11.5 cm，任何行李箱均不能入場。</div>
+    </section>
+
+    <section class="section panel" id="itinerary">
+      <div class="section-head">
+        <div><p class="eyebrow">Daily route</p><h2>逐日行程</h2><p>四天資料可搜尋、篩選及編輯；修改會自動儲存在目前手機。</p></div>
+        <button class="button" id="edit-day" type="button">編輯目前日期</button>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="搜尋航班、酒店、演唱會或交通">
+        <select id="kind-filter" aria-label="行程類型"><option value="all">全部類型</option><option value="transport">交通</option><option value="hotel">酒店</option><option value="show">演唱會</option><option value="activity">活動</option><option value="food">餐飲</option></select>
+      </div>
+      <div class="timeline-shell">
+        <div class="day-nav" id="day-nav"></div>
+        <div class="day-view"><div class="day-summary" id="day-summary"></div><div class="timeline" id="timeline"></div></div>
+      </div>
+    </section>
+
+    <section class="section panel" id="nightlife">
+      <div class="section-head">
+        <div><p class="eyebrow">After-dinner drinks</p><h2>飯後輕酌 · 與朋友飲一兩杯</h2><p>全部只作候選，不預約、不鎖死時間。9/26 演唱會及晚餐後，按體力、朋友位置與現場人流四選一。</p></div>
+        <span class="chip done">首選 Fake Sober</span>
+      </div>
+      <div class="nightlife-grid">
+        <article class="nightlife-card featured">
+          <span class="chip done">A · 首選</span>
+          <h3>Fake Sober Taipei</h3>
+          <p class="nightlife-meta">信義區松壽路 20 號 · 18:00 後酒吧時段 · 約 02:00 收</p>
+          <p>最貼近你想要的感覺：開放式街邊氣氛，不用坐成一頓正式酒局，適合朋友飲一兩杯。</p>
+          <div class="nightlife-tags"><span class="nightlife-tag">街邊輕酌</span><span class="nightlife-tag">調酒／啤酒</span><span class="nightlife-tag">氣氛首選</span></div>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Fake+Sober+Taipei" target="_blank" rel="noreferrer">Google Maps 路線 →</a>
+        </article>
+        <article class="nightlife-card">
+          <span class="chip">B · 滿座後備</span>
+          <h3>Sleep No More Café</h3>
+          <p class="nightlife-meta">信義區松壽路 26 號 · 約 03:00 收 · Walk-in</p>
+          <p>就在 Fake Sober 附近，氣氛同樣開放輕鬆；首選太多人時可直接轉場，店方資料顯示不接受預約。</p>
+          <div class="nightlife-tags"><span class="nightlife-tag">相鄰後備</span><span class="nightlife-tag">較夜收</span><span class="nightlife-tag">不設預約</span></div>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Sleep+No+More+Cafe+Taipei" target="_blank" rel="noreferrer">Google Maps 路線 →</a>
+        </article>
+        <article class="nightlife-card">
+          <span class="chip">C · 快飲一杯</span>
+          <h3>Draft Land Xinyi</h3>
+          <p class="nightlife-meta">信義區松高路 19 號 1 樓 · 當日再核對營業時間</p>
+          <p>主打 tap cocktail，點飲品快、選擇直接，適合只想輕鬆飲一至兩杯，不想花時間研究酒單。</p>
+          <div class="nightlife-tags"><span class="nightlife-tag">Tap Cocktail</span><span class="nightlife-tag">快飲快走</span><span class="nightlife-tag">信義區</span></div>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=Draft+Land+Xinyi" target="_blank" rel="noreferrer">Google Maps 路線 →</a>
+        </article>
+        <article class="nightlife-card">
+          <span class="chip">D · 坐低傾偈</span>
+          <h3>OriginBAR 源</h3>
+          <p class="nightlife-meta">松山區南京東路四段 133 巷 5 弄 31 號 · 小巨蛋站約 5 分鐘</p>
+          <p>比街邊立飲更舒服，主打茶系調酒；若演唱會後想就近坐低慢慢傾偈，這間最合適。星期六約 02:00 收。</p>
+          <div class="nightlife-tags"><span class="nightlife-tag">座位較穩</span><span class="nightlife-tag">茶系調酒</span><span class="nightlife-tag">近小巨蛋</span></div>
+          <a href="https://www.google.com/maps/search/?api=1&amp;query=OriginBAR+%E6%BA%90+Taipei" target="_blank" rel="noreferrer">Google Maps 路線 →</a>
+        </article>
+      </div>
+      <p class="nightlife-note"><strong>現場判斷：</strong>想要熱鬧街頭感選 Fake Sober；太多人便行去 Sleep No More；想快速飲完離開選 Draft Land；想坐低談話選 OriginBAR。前兩間屬開放式場地，高峰可能較嘈及要站飲；吸煙環境未獲店方明確保證，介意煙味要到場先問。</p>
+    </section>
+
+    <section class="section panel" id="trip-map">
+      <div class="section-head"><div><p class="eyebrow">Online + offline route</p><h2>台北行程地圖</h2><p>有網絡時開 Google My Maps／即時導航；離線時看已下載的兩日路線、地址和時間。</p></div></div>
+      <div class="map-mode" role="tablist" aria-label="地圖模式">
+        <button class="active" id="show-online-map" type="button" role="tab" aria-selected="true">線上互動地圖</button>
+        <button id="show-offline-map" type="button" role="tab" aria-selected="false">離線路線圖</button>
+      </div>
+      <div class="map-panel" id="online-map-panel" role="tabpanel">
+      <p class="map-private-note">專屬 My Maps 已在 padking4gpt@gmail.com。若嵌入位置要求登入，可按「只看地圖」在 Google Maps 開啟；導航按鈕需要網絡。</p>
+      <div class="map-grid">
+        <iframe class="map-frame" title="台北 LANY 2026 Google My Maps" loading="lazy" src="https://www.google.com/maps/d/embed?mid=1qS73tEk4fXy4ET0t5d-9Zf0CyJlZv5Q&amp;ehbc=2E312F"></iframe>
+        <div>
+          <div class="map-list">
+            <article><b>臺灣桃園國際機場</b><span>T1 抵達及離境</span></article>
+            <article><b>天閣酒店 台北復興</b><span>復興北路 147 號 · 南京復興站附近</span></article>
+            <article><b>臺北小巨蛋</b><span>LANY 演唱會場地</span></article>
+            <article><b>南京復興站</b><span>酒店最近主要捷運站</span></article>
+            <article><b>台北小巨蛋站</b><span>場館 2 號出口</span></article>
+            <article><b>機捷 A1 台北車站</b><span>機場捷運轉乘點</span></article>
+            <article><b>Fake Sober Taipei</b><span>飯後輕酌首選 · 松壽路 20 號</span></article>
+            <article><b>Sleep No More Café</b><span>Fake Sober 附近的 Walk-in 後備</span></article>
+            <article><b>Draft Land Xinyi</b><span>Tap cocktail · 適合快飲一兩杯</span></article>
+            <article><b>OriginBAR 源</b><span>近小巨蛋 · 適合坐低談話</span></article>
+          </div>
+          <div class="map-links">
+            <a href="https://www.google.com/maps/d/u/1/edit?mid=1qS73tEk4fXy4ET0t5d-9Zf0CyJlZv5Q" target="_blank" rel="noreferrer">在 Google My Maps 編輯</a>
+            <a href="https://www.google.com/maps/d/viewer?mid=1qS73tEk4fXy4ET0t5d-9Zf0CyJlZv5Q" target="_blank" rel="noreferrer">只看地圖</a>
+            <a href="https://www.google.com/maps/dir/?api=1&amp;origin=Taiwan+Taoyuan+International+Airport+Terminal+1&amp;destination=The+Tango+Taipei+Fuhsing&amp;travelmode=driving" target="_blank" rel="noreferrer">機場 → 酒店導航</a>
+            <a href="https://www.google.com/maps/dir/?api=1&amp;origin=The+Tango+Taipei+Fuhsing&amp;destination=Taipei+Arena&amp;travelmode=transit" target="_blank" rel="noreferrer">酒店 → 台北小巨蛋導航</a>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="map-panel" id="offline-map-panel" role="tabpanel" hidden>
+        <div class="route-board">
+          <article class="route-day">
+            <span class="chip done">9/26 · LANY</span>
+            <h3>酒店補眠 → 午餐 → VIP → 演唱會</h3>
+            <p>凌晨入住後先睡夠；14:00 前到小巨蛋，演唱會後按體力決定宵夜及輕酌。</p>
+            <ol class="route-list">
+              <li><div><b>桃園機場 T1</b><span>01:55 抵達；1 樓接機大廳西側 12 號門乘的士</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Taoyuan+Airport+Terminal+1">有網絡時開地圖</a></div></li>
+              <li><div><b>天閣酒店 台北復興</b><span>台北市松山區復興北路 147 號 · 約 04:00 入房休息</span><a href="https://www.google.com/maps/search/?api=1&amp;query=The+Tango+Taipei+Fuhsing">有網絡時開地圖</a></div></li>
+              <li><div><b>林東芳牛肉麵</b><span>台北市中山區八德路二段 322 號 · 建議 11:30 午餐</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Lin+Dong+Fang+Beef+Noodle">有網絡時開地圖</a></div></li>
+              <li><div><b>台北小巨蛋 2 號入口</b><span>台北市松山區南京東路四段 2 號 · 14:00 VIP 報到</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Taipei+Arena+Entrance+2">有網絡時開地圖</a></div></li>
+              <li><div><b>演唱會後</b><span>首選：輕宵夜 → Fake Sober；太累便直接返酒店</span><a href="https://www.google.com/maps/dir/?api=1&amp;origin=Taipei+Arena&amp;destination=Fake+Sober+Taipei&amp;travelmode=transit">有網絡時開路線</a></div></li>
+            </ol>
+          </article>
+          <article class="route-day">
+            <span class="chip">9/27 · 舊城美食</span>
+            <h3>慈聖宮 → 迪化街 → 河岸 → 寧夏</h3>
+            <p>行李留在酒店；18:30 開始回程，19:30–19:45 由酒店出發往機場。</p>
+            <ol class="route-list">
+              <li><div><b>慈聖宮美食街</b><span>台北市大同區保安街 49 巷 · 11:30 午餐</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Cisheng+Temple+Food+Street+Taipei">有網絡時開地圖</a></div></li>
+              <li><div><b>迪化街</b><span>13:00 老店、茶、南北貨及歷史街區</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Dihua+Street+Taipei">有網絡時開地圖</a></div></li>
+              <li><div><b>大稻埕碼頭</b><span>16:00 河岸散步；下雨可縮短停留</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Dadaocheng+Wharf">有網絡時開地圖</a></div></li>
+              <li><div><b>寧夏夜市</b><span>17:00 早晚餐；18:30 前離開</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Ningxia+Night+Market">有網絡時開地圖</a></div></li>
+              <li><div><b>酒店取行李 → 桃園機場 T1</b><span>19:30–19:45 出發；目標 20:30 左右抵達</span><a href="https://www.google.com/maps/dir/?api=1&amp;origin=The+Tango+Taipei+Fuhsing&amp;destination=Taoyuan+Airport+Terminal+1&amp;travelmode=transit">有網絡時開路線</a></div></li>
+            </ol>
+          </article>
+        </div>
+        <div class="offline-pack" aria-label="離線重要資料">
+          <article><b>酒店</b><span>天閣酒店台北復興<br>復興北路 147 號</span></article>
+          <article><b>LANY VIP</b><span>14:00 周邊／報到<br>按票券：15:50／16:50 整隊</span></article>
+          <article><b>回程</b><span>HB707 · 9/27 23:45<br>桃園機場 T1</span></article>
+        </div>
+        <p class="offline-note"><strong>離線限制：</strong>這裡保存的是行程順序、時間與地址，不是即時街道圖。出發前亦請在 Google Maps App 下載「台北」離線地圖；即時捷運、路況及導航仍需網絡。</p>
+      </div>
+    </section>
+
+    <section class="section panel" id="trip-notes">
+      <div class="section-head"><div><p class="eyebrow">Living notes</p><h2>旅程備註</h2><p>文字停止輸入約一秒後自動儲存在目前手機。</p></div><span class="chip" id="note-status">已載入</span></div>
+      <textarea id="notes" aria-label="旅程備註"></textarea>
+    </section>
+
+    <section class="section panel" id="sources">
+      <div class="section-head"><div><p class="eyebrow">Official references</p><h2>已核對資料來源</h2><p>航班以你提供的最新截圖為準；以下為官方行程資料。</p></div></div>
+      <div class="source-grid">
+        <a href="https://www.livenation.com.tw/lany-tpe26" target="_blank" rel="noreferrer"><b>Live Nation Taiwan · VIP 入場辦法</b><span>19:30 開演、VIP 報到、整隊、周邊及安檢規定</span></a>
+        <a href="https://www.arena.taipei/Content_List.aspx?n=58355307EB94AD7B" target="_blank" rel="noreferrer"><b>台北小巨蛋</b><span>官方地址及場館資料</span></a>
+        <a href="https://fh.tango-hotels.com/_en/" target="_blank" rel="noreferrer"><b>The Tango Taipei Fuxing</b><span>酒店地址、電話及交通</span></a>
+        <a href="https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/dep-A12" target="_blank" rel="noreferrer"><b>桃園機場捷運</b><span>第一航廈站首末班車</span></a>
+        <a href="https://web.metro.taipei/pages2026/WebStation/109" target="_blank" rel="noreferrer"><b>台北捷運</b><span>小巨蛋站官方資料</span></a>
+        <a href="https://tixcraft.com/" target="_blank" rel="noreferrer"><b>拓元售票</b><span>Live Nation 頁面所列官方售票平台</span></a>
+        <a href="https://www.instagram.com/fakesobertaipei/" target="_blank" rel="noreferrer"><b>Fake Sober Taipei</b><span>飯後輕酌首選的官方社交頁</span></a>
+        <a href="https://www.instagram.com/sleepnomorecafe/" target="_blank" rel="noreferrer"><b>Sleep No More Café</b><span>附近後備選擇及最新營業資訊</span></a>
+        <a href="https://www.instagram.com/originbar_yuan/" target="_blank" rel="noreferrer"><b>OriginBAR 源</b><span>近小巨蛋的茶系調酒選擇</span></a>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="day-dialog">
+    <form method="dialog" id="day-form">
+      <div class="dialog-head"><div><p class="eyebrow">Edit itinerary</p><h2 style="margin:0">編輯目前日期</h2></div><button class="button" value="cancel" type="submit">關閉</button></div>
+      <div class="dialog-body">
+        <div class="edit-grid">
+          <div class="field"><label for="edit-label">日期標題</label><input id="edit-label"></div>
+          <div class="field"><label for="edit-density">密度標記</label><input id="edit-density"></div>
+          <div class="field full"><label for="edit-read">重點摘要</label><textarea id="edit-read" style="min-height:90px"></textarea></div>
+        </div>
+        <h3 style="margin:20px 0 8px">行程項目</h3>
+        <div id="edit-items"></div>
+        <button class="button" id="add-item" type="button" style="margin-top:12px">＋ 新增項目</button>
+      </div>
+      <div class="dialog-foot"><span style="color:var(--muted)">儲存到目前手機，離線可用。</span><button class="button primary" id="save-day" value="default" type="submit">儲存日期</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      "use strict";
+      const DATA_URL = "./trip-data.json";
+      const STORAGE_KEY = "taipei-lany-trip-2026-state-v1";
+      const kinds = {transport:"交通",hotel:"酒店",show:"演唱會",activity:"活動",food:"餐飲"};
+      const $ = id => document.getElementById(id);
+      let state = null, currentDay = 0, saveTimer = null, noteTimer = null, installPrompt = null;
+
+      function setSystem(mode, message) {
+        $("system-bar").dataset.state = mode;
+        $("system-message").textContent = message;
+      }
+      function toast(message) {
+        const el = $("toast"); el.textContent = message; el.classList.add("show");
+        clearTimeout(el._timer); el._timer = setTimeout(() => el.classList.remove("show"), 2400);
+      }
+      function payload() {
+        return { revision:state.revision, taskChecks:state.taskChecks, taskItems:state.taskItems, days:state.days, notes:state.notes };
+      }
+      async function saveNow(label="修改") {
+        if (!state) return;
+        clearTimeout(saveTimer); setSystem("loading", `正在儲存${label}到手機…`);
+        try {
+          state.revision = Number(state.revision || 0) + 1;
+          state.updatedAt = new Date().toISOString();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          setSystem("saved", `已儲存在這部手機 · revision ${state.revision}${navigator.onLine ? " · 線上" : " · 離線"}`);
+          $("note-status").textContent = "已儲存";
+        } catch (error) {
+          setSystem("error", error.message);
+          toast(`未能儲存：${error.message}`);
+        }
+      }
+      function queueSave(label) { clearTimeout(saveTimer); saveTimer = setTimeout(() => saveNow(label), 450); }
+
+      function renderTasks() {
+        const grid = $("task-grid"); grid.textContent = "";
+        state.taskItems.forEach(task => {
+          const done = Boolean(state.taskChecks[task.id]);
+          const label = document.createElement("label"); label.className = `task${done ? " complete" : ""}`;
+          const check = document.createElement("input"); check.type = "checkbox"; check.checked = done; check.setAttribute("aria-label", task.title);
+          check.addEventListener("change", () => { state.taskChecks[task.id] = check.checked; renderTasks(); queueSave("待辦"); });
+          const copy = document.createElement("div"); copy.innerHTML = `<b>${escapeHtml(task.title)}</b><p>${escapeHtml(task.note)}</p>`;
+          const badge = document.createElement("span"); badge.className = "priority"; badge.textContent = done ? "DONE" : task.priority;
+          label.append(check, copy, badge); grid.append(label);
+        });
+        const open = state.taskItems.filter(item => !state.taskChecks[item.id]).length;
+        $("open-count").textContent = open;
+      }
+      function renderDays() {
+        const nav = $("day-nav"); nav.textContent = "";
+        state.days.forEach((day,index) => {
+          const button = document.createElement("button"); button.type = "button"; button.className = `day-button${index===currentDay ? " active" : ""}`;
+          button.innerHTML = `<strong>${escapeHtml(day.day)} · ${escapeHtml(day.label)}</strong><span>${escapeHtml(day.density)}</span>`;
+          button.addEventListener("click", () => { currentDay=index; renderDays(); }); nav.append(button);
+        });
+        renderCurrentDay();
+      }
+      function renderCurrentDay() {
+        const day = state.days[currentDay];
+        $("day-summary").innerHTML = `<div><b>${escapeHtml(day.day)} · ${escapeHtml(day.label)}</b><p>${escapeHtml(day.read)}</p></div><div><small>${escapeHtml(day.density)}</small><div class="progress"><i style="width:${Number(day.width)}%"></i></div></div>`;
+        const query = $("search").value.trim().toLowerCase(); const kind = $("kind-filter").value;
+        const items = day.items.filter(item => (kind === "all" || item[3] === kind) && (!query || item.join(" ").toLowerCase().includes(query)));
+        const timeline = $("timeline"); timeline.textContent = "";
+        if (!items.length) { timeline.innerHTML = `<div class="stop"><time>—</time><span class="dot"></span><div><b>沒有符合的項目</b><p>改用「全部類型」或清除搜尋字。</p></div></div>`; return; }
+        items.forEach(item => {
+          const row = document.createElement("article"); row.className="stop"; row.dataset.kind=item[3];
+          row.innerHTML=`<time>${escapeHtml(item[0])}</time><span class="dot"></span><div><b>${escapeHtml(item[1])}</b><p>${escapeHtml(item[2])}</p></div><span class="kind">${kinds[item[3]] || item[3]}</span>`;
+          timeline.append(row);
+        });
+      }
+      function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch])); }
+
+      function openEditor() {
+        const day=state.days[currentDay]; $("edit-label").value=day.label; $("edit-density").value=day.density; $("edit-read").value=day.read;
+        const host=$("edit-items"); host.textContent=""; day.items.forEach(item => addEditRow(item)); $("day-dialog").showModal();
+      }
+      function addEditRow(item=["","","","activity"]) {
+        const row=document.createElement("div"); row.className="edit-item";
+        row.innerHTML=`<input aria-label="時間" value="${escapeHtml(item[0])}" placeholder="時間"><input aria-label="標題" value="${escapeHtml(item[1])}" placeholder="項目"><input aria-label="說明" value="${escapeHtml(item[2])}" placeholder="說明"><select aria-label="類型">${Object.entries(kinds).map(([value,label])=>`<option value="${value}"${value===item[3]?" selected":""}>${label}</option>`).join("")}</select><button class="remove" type="button">刪除</button>`;
+        row.querySelector(".remove").addEventListener("click",()=>row.remove()); $("edit-items").append(row);
+      }
+      function commitEditor() {
+        const day=state.days[currentDay]; const rows=[...$("edit-items").querySelectorAll(".edit-item")];
+        const items=rows.map(row=>{const fields=row.querySelectorAll("input,select");return [fields[0].value.trim(),fields[1].value.trim(),fields[2].value.trim(),fields[3].value];}).filter(item=>item[1]);
+        if (!items.length) { toast("至少保留一個行程項目"); return false; }
+        day.label=$("edit-label").value.trim() || day.label; day.density=$("edit-density").value.trim() || `${items.length} STOPS`; day.read=$("edit-read").value.trim(); day.items=items; day.width=Math.min(100,Math.max(20,Math.round(items.length/6*100)));
+        renderDays(); queueSave("行程"); return true;
+      }
+      async function load() {
+        setSystem("loading","正在載入手機行程資料…");
+        try {
+          let data = null;
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) data = JSON.parse(saved);
+          if (!data) {
+            const response=await fetch(DATA_URL,{cache:"no-store"});
+            data=await response.json();
+            if(!response.ok) throw new Error(data.error||"載入失敗");
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          }
+          state=data; $("notes").value=state.notes; renderTasks(); renderDays();
+          setSystem("saved", `行程已可使用 · revision ${state.revision}${navigator.onLine ? " · 線上" : " · 離線"}`);
+        } catch(error) { setSystem("error",`未能載入行程：${error.message}`); toast(`未能載入：${error.message}`); }
+      }
+      function updateConnection() {
+        const online = navigator.onLine;
+        const badge = $("connection-state");
+        badge.className = `connection ${online ? "online" : "offline"}`;
+        badge.textContent = online ? "線上 · 可導航" : "離線 · 行程仍可看";
+        if (!online) showMapMode("offline");
+      }
+      function showMapMode(mode) {
+        const online = mode === "online";
+        $("online-map-panel").hidden = !online;
+        $("offline-map-panel").hidden = online;
+        $("show-online-map").classList.toggle("active", online);
+        $("show-offline-map").classList.toggle("active", !online);
+        $("show-online-map").setAttribute("aria-selected", String(online));
+        $("show-offline-map").setAttribute("aria-selected", String(!online));
+      }
+      async function installApp() {
+        if (installPrompt) {
+          installPrompt.prompt();
+          await installPrompt.userChoice;
+          installPrompt = null;
+          return;
+        }
+        $("install-help").classList.toggle("show");
+        $("install-help").scrollIntoView({behavior:"smooth",block:"nearest"});
+      }
+      $("reload-system").addEventListener("click",load);
+      $("search").addEventListener("input",renderCurrentDay); $("kind-filter").addEventListener("change",renderCurrentDay);
+      $("edit-day").addEventListener("click",openEditor); $("add-item").addEventListener("click",()=>addEditRow());
+      $("day-form").addEventListener("submit",event=>{ if(event.submitter && event.submitter.id==="save-day" && !commitEditor()) event.preventDefault(); });
+      $("notes").addEventListener("input",()=>{ if(!state)return; state.notes=$("notes").value; $("note-status").textContent="等待儲存"; clearTimeout(noteTimer); noteTimer=setTimeout(()=>saveNow("備註"),900); });
+      $("show-online-map").addEventListener("click",()=>showMapMode("online"));
+      $("show-offline-map").addEventListener("click",()=>showMapMode("offline"));
+      $("install-app").addEventListener("click",installApp);
+      window.addEventListener("online",updateConnection);
+      window.addEventListener("offline",updateConnection);
+      window.addEventListener("beforeinstallprompt",event=>{ event.preventDefault(); installPrompt=event; });
+      window.addEventListener("appinstalled",()=>toast("已加到手機主畫面"));
+      window.addEventListener("beforeprint",()=>{if(state)renderDays();});
+      if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+      updateConnection();
+      load();
+    })();
+  </script>
+</body>
+</html>
