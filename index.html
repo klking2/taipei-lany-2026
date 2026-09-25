@@ -59,6 +59,20 @@
     .flight-check-card .flight-warning { color:#a2512f; font-weight:850; }
     .flight-check-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
     .flight-check-links a { min-height:40px; display:inline-flex; align-items:center; padding:0 12px; border-radius:12px; background:#fff; color:#775b25; text-decoration:none; font-weight:850; }
+    .transfer-summary { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; padding:15px 16px; border:1px solid #cde9df; border-radius:17px; background:#f2fbf7; color:#286a59; }
+    .transfer-summary b,.transfer-summary span { display:block; }
+    .transfer-summary span { margin-top:3px; font-size:14px; }
+    .transfer-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .transfer-card { display:flex; flex-direction:column; gap:9px; padding:17px; border:1px solid var(--line); border-radius:19px; background:#fbfcff; }
+    .transfer-card.recommended { border-color:#bfd2ff; background:linear-gradient(145deg,#f8faff,#eef3ff); }
+    .transfer-card h3 { margin:0; font-size:19px; }
+    .transfer-card p { margin:0; color:var(--muted); }
+    .transfer-meta { display:flex; flex-wrap:wrap; gap:7px; }
+    .transfer-meta span { padding:5px 8px; border-radius:999px; background:#eef2f8; color:#59667e; font-size:12px; font-weight:900; }
+    .transfer-card.recommended .transfer-meta span { color:#4d63bd; background:#e2eaff; }
+    .transfer-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:3px; }
+    .transfer-actions a { min-height:40px; display:inline-flex; align-items:center; padding:0 11px; border-radius:11px; background:#fff; color:#4d63bd; text-decoration:none; font-size:14px; font-weight:900; }
+    .transfer-footnote { margin:14px 0 0; padding:13px 15px; border-radius:15px; background:var(--amber-soft); color:#785b2a; font-size:14px; }
     .app-tabs { display:none; }
     .board { display:grid; grid-template-columns:1.05fr 1.25fr .9fr; gap:16px; align-items:stretch; }
     .panel { background:rgba(255,255,255,.9); border:1px solid rgba(218,228,244,.92); border-radius:var(--radius); box-shadow:var(--shadow); }
@@ -257,6 +271,8 @@
       .restaurant-grid { grid-template-columns:1fr; }
       .flight-check-grid { grid-template-columns:1fr; }
       .flight-check-head { flex-direction:column; }
+      .transfer-grid { grid-template-columns:1fr; }
+      .transfer-summary { align-items:flex-start; flex-direction:column; }
       .vip-grid { grid-template-columns:1fr; }
       .route-board,.offline-pack { grid-template-columns:1fr; }
       .document-grid { grid-template-columns:1fr; }
@@ -267,8 +283,8 @@
       .stop { grid-template-columns:72px 12px 1fr; }
       .kind { grid-column:3; justify-self:start; }
       .edit-item { grid-template-columns:1fr; padding:12px; border:1px solid var(--line); border-radius:14px; }
-      .app-tabs { position:fixed; z-index:30; left:9px; right:9px; bottom:max(8px,env(safe-area-inset-bottom)); display:grid; grid-template-columns:repeat(5,1fr); gap:4px; padding:7px; border:1px solid rgba(207,217,237,.95); border-radius:18px; background:rgba(255,255,255,.96); box-shadow:0 16px 40px rgba(27,43,78,.22); backdrop-filter:blur(14px); }
-      .app-tabs a { min-width:0; padding:8px 3px; border-radius:12px; color:#52617f; text-align:center; text-decoration:none; font-size:12px; font-weight:900; }
+      .app-tabs { position:fixed; z-index:30; left:9px; right:9px; bottom:max(8px,env(safe-area-inset-bottom)); display:grid; grid-template-columns:repeat(6,1fr); gap:3px; padding:7px; border:1px solid rgba(207,217,237,.95); border-radius:18px; background:rgba(255,255,255,.96); box-shadow:0 16px 40px rgba(27,43,78,.22); backdrop-filter:blur(14px); }
+      .app-tabs a { min-width:0; padding:8px 2px; border-radius:12px; color:#52617f; text-align:center; text-decoration:none; font-size:11px; font-weight:900; }
       .app-tabs a[aria-current="true"] { color:#fff; background:var(--blue); }
     }
     @media print {
@@ -302,7 +318,7 @@
       <button id="reload-system" type="button">重新載入</button>
     </div>
     <nav class="quick-nav" aria-label="快速前往">
-      <a href="#tasks">待辦</a><a href="#offline-wallet">離線證件包</a><a href="#vip-guide">VIP 入場</a><a href="#itinerary">逐日行程</a><a href="#restaurants">酒店附近餐廳</a><a href="#nightlife">飯後輕酌</a><a href="#trip-map">線上／離線地圖</a><a href="#trip-notes">備註</a><a href="#sources">官方資料</a>
+      <a href="#tasks">待辦</a><a href="#offline-wallet">離線證件包</a><a href="#airport-transfer">機場交通</a><a href="#vip-guide">VIP 入場</a><a href="#itinerary">逐日行程</a><a href="#restaurants">酒店附近餐廳</a><a href="#nightlife">飯後輕酌</a><a href="#trip-map">線上／離線地圖</a><a href="#trip-notes">備註</a><a href="#sources">官方資料</a>
     </nav>
 
     <section class="flight-check panel" id="flight-check" aria-label="航班即時核對">
@@ -315,6 +331,56 @@
         <article class="flight-check-card"><b>回程 HB707 · 9/27</b><span>現行班表：23:45 · TPE T1 → 9/28 01:50 · HKG T1。</span><span>與你已確認的回程資料一致；因尚未到出發日，閘口及即時狀態未公布。</span></article>
       </div>
       <div class="flight-check-links"><a href="https://www.hongkongairport.com/en/flights/departures/passenger.page" target="_blank" rel="noreferrer">香港機場即時離境</a><a href="https://web.taoyuan-airport.com/flight_arrival" target="_blank" rel="noreferrer">桃園機場抵達</a><a href="https://www.greaterbay-airlines.com/hk/en/book/flying-with-us/flight-schedule.html" target="_blank" rel="noreferrer">大灣區航空班表</a></div>
+    </section>
+
+    <section class="section panel" id="airport-transfer">
+      <div class="section-head">
+        <div><p class="eyebrow">TPE T1 → The Tango Taipei Fuhsing</p><h2>凌晨機場交通選擇</h2><p>按你 9/26 凌晨抵達的時段整理；不再只寫的士，並把可用與不可立即使用的方案分開。</p></div>
+        <span class="chip warn">機捷要等到 05:58</span>
+      </div>
+      <div class="transfer-summary">
+        <div><b>兩人＋行李的實用排序</b><span>已預約接送 → 機場官方的士／共乘的士 → 1819＋市區的士 → 等首班機捷</span></div>
+        <span class="chip done">1819 凌晨有班次</span>
+      </div>
+      <div class="transfer-grid">
+        <article class="transfer-card recommended">
+          <div class="transfer-meta"><span>最省力</span><span>點對點</span><span>需預約</span></div>
+          <h3>A · 預約機場接送</h3>
+          <p>司機按航班接機，直接送到天閣台北復興。最適合紅眼機、兩人及有行李；預訂時要填 HB710、T1，以及航班可能延誤。</p>
+          <div class="transfer-actions"><a href="https://www.google.com/search?q=桃園機場+台北市區+機場接送" target="_blank" rel="noreferrer">比較接送服務</a><a href="https://www.google.com/maps/dir/?api=1&amp;origin=Taiwan+Taoyuan+International+Airport+Terminal+1&amp;destination=The+Tango+Taipei+Fuhsing&amp;travelmode=driving" target="_blank" rel="noreferrer">查看車程</a></div>
+        </article>
+        <article class="transfer-card recommended">
+          <div class="transfer-meta"><span>24 小時</span><span>毋須預約</span><span>最快上車</span></div>
+          <h3>B · 機場官方的士</h3>
+          <p>T1 一樓接機大廳西側 12 號門上車，按錶收費，高速公路通行費另計。航班再延誤亦可使用，是目前最穩陣的即場方案。</p>
+          <div class="transfer-actions"><a href="https://www.taoyuan-airport.com/taxi" target="_blank" rel="noreferrer">機場官方資料</a><a href="tel:+88633834499">T1 的士中心</a></div>
+        </article>
+        <article class="transfer-card">
+          <div class="transfer-meta"><span>00:00–06:00</span><span>較慳錢</span><span>視即場供應</span></div>
+          <h3>C · 機場共乘的士</h3>
+          <p>桃園機場官方列有午夜至早上 6 時的共乘服務。抵達後先到 T1 的士服務中心問當晚有沒有往台北市區／松山區的共乘車及實際收費。</p>
+          <div class="transfer-actions"><a href="https://www.taoyuan-airport.com/taxi" target="_blank" rel="noreferrer">共乘服務資料</a><a href="tel:+88633834499">致電查詢</a></div>
+        </article>
+        <article class="transfer-card">
+          <div class="transfer-meta"><span>凌晨可用</span><span>NT$133–164／位</span><span>需再轉的士</span></div>
+          <h3>D · 國光 1819＋市區的士</h3>
+          <p>由桃園機場前往台北轉運站，再轉的士到酒店。9/26 官方表列二航凌晨 02:00、02:30、02:50、03:10、03:40 等班次；車輛先在一航上客，所以一航實際時間請看現場電子牌／客運櫃位。</p>
+          <div class="transfer-actions"><a href="https://www.taiwanbus.tw/eBUSPage/Query/QueryResult.aspx?lan=C&amp;rno=18190" target="_blank" rel="noreferrer">1819 官方班次</a><a href="https://www.google.com/maps/dir/?api=1&amp;origin=Taipei+Bus+Station&amp;destination=The+Tango+Taipei+Fuhsing&amp;travelmode=driving" target="_blank" rel="noreferrer">轉的士路線</a></div>
+        </article>
+        <article class="transfer-card">
+          <div class="transfer-meta"><span>App 即時叫車</span><span>價格浮動</span><span>後備</span></div>
+          <h3>E · Uber／App 叫車</h3>
+          <p>到埗後按 App 指示前往指定接客點；車價及等候時間會即時變動。適合官方的士排隊太長時作後備，落單前先核對車牌與上車位置。</p>
+          <div class="transfer-actions"><a href="https://m.uber.com/looking" target="_blank" rel="noreferrer">開啟 Uber</a></div>
+        </article>
+        <article class="transfer-card">
+          <div class="transfer-meta"><span>最平</span><span>05:58 首班直達</span><span>不建議紅眼機</span></div>
+          <h3>F · 等首班機場捷運</h3>
+          <p>A12 第一航廈往台北首班直達車為 05:58，普通車 06:07。即使 01:25 抵達亦要等約 4 小時，再由 A1 轉捷運／的士到酒店，只適合想極力節省交通費。</p>
+          <div class="transfer-actions"><a href="https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/timetable-A12" target="_blank" rel="noreferrer">A12 官方時刻</a></div>
+        </article>
+      </div>
+      <p class="transfer-footnote"><strong>抵達後的即時做法：</strong>先看入境完成時間。想直接休息就去 12 號門搭官方的士；想慳錢先問共乘，再看 1819 電子牌。未預約接送前，本頁只是交通方案，不代表已替你訂車或付款。</p>
     </section>
 
     <section class="board" aria-label="台北 LANY 旅程總覽">
@@ -356,7 +422,7 @@
 
       <div class="activity-strip panel">
         <article><b>01:55 抵台</b><span>9/26 · 桃園機場 T1</span></article>
-        <article><b>凌晨接送</b><span>機捷未開 · 接送／的士優先</span></article>
+        <article><b>凌晨交通</b><span>接送／的士／共乘／1819 可選</span></article>
         <article><b>14:00 VIP 報到</b><span>小巨蛋 2 號入口旁 · 同時可優先買周邊</span></article>
         <article><b>23:45 回港</b><span>9/27 HB707 · 最新時間已確認</span></article>
       </div>
@@ -686,7 +752,7 @@
             <h3>酒店補眠 → 午餐 → VIP → 演唱會</h3>
             <p>凌晨入住後先睡夠；14:00 前到小巨蛋，演唱會後按體力決定宵夜及輕酌。</p>
             <ol class="route-list">
-              <li><div><b>桃園機場 T1</b><span>01:55 抵達；1 樓接機大廳西側 12 號門乘的士</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Taoyuan+Airport+Terminal+1">有網絡時開地圖</a></div></li>
+              <li><div><b>桃園機場 T1</b><span>01:55 抵達；可選 12 號門官方的士、00:00–06:00 共乘的士，或 1819 到台北轉運站再轉的士</span><a href="#airport-transfer">查看完整交通比較</a></div></li>
               <li><div><b>天閣酒店 台北復興</b><span>台北市松山區復興北路 147 號 · 約 04:00 入房休息</span><a href="https://www.google.com/maps/search/?api=1&amp;query=The+Tango+Taipei+Fuhsing">有網絡時開地圖</a></div></li>
               <li><div><b>林東芳牛肉麵</b><span>台北市中山區八德路二段 322 號 · 建議 11:30 午餐</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Lin+Dong+Fang+Beef+Noodle">有網絡時開地圖</a></div></li>
               <li><div><b>台北小巨蛋 2 號入口</b><span>台北市松山區南京東路四段 2 號 · 14:00 VIP 報到</span><a href="https://www.google.com/maps/search/?api=1&amp;query=Taipei+Arena+Entrance+2">有網絡時開地圖</a></div></li>
@@ -711,7 +777,7 @@
           <article><b>LANY VIP</b><span>14:00 周邊／報到<br>按票券：15:50／16:50 整隊</span></article>
           <article><b>回程</b><span>HB707 · 9/27 23:45<br>桃園機場 T1</span></article>
         </div>
-        <p class="offline-note"><strong>離線限制：</strong>這裡保存的是行程順序、時間與地址，不是即時街道圖。出發前亦請在 Google Maps App 下載「台北」離線地圖；即時捷運、路況及導航仍需網絡。</p>
+        <p class="offline-note"><strong>離線限制：</strong>這裡保存的是行程順序、時間、地址及機場交通備忘，不是即時街道圖。出發前亦請在 Google Maps App 下載「台北」離線地圖；1819 班次、路況及即時導航仍需網絡。</p>
       </div>
     </section>
 
@@ -729,7 +795,9 @@
         <a href="https://www.livenation.com.tw/lany-tpe26" target="_blank" rel="noreferrer"><b>Live Nation Taiwan · VIP 入場辦法</b><span>19:30 開演、VIP 報到、整隊、周邊及安檢規定</span></a>
         <a href="https://www.arena.taipei/Content_List.aspx?n=58355307EB94AD7B" target="_blank" rel="noreferrer"><b>台北小巨蛋</b><span>官方地址及場館資料</span></a>
         <a href="https://fh.tango-hotels.com/_en/" target="_blank" rel="noreferrer"><b>The Tango Taipei Fuxing</b><span>酒店地址、電話及交通</span></a>
-        <a href="https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/dep-A12" target="_blank" rel="noreferrer"><b>桃園機場捷運</b><span>第一航廈站首末班車</span></a>
+        <a href="https://www.taoyuan-airport.com/taxi" target="_blank" rel="noreferrer"><b>桃園機場 · 官方的士</b><span>T1 上車位置、24 小時服務及午夜共乘服務</span></a>
+        <a href="https://www.taiwanbus.tw/eBUSPage/Query/QueryResult.aspx?lan=C&amp;rno=18190" target="_blank" rel="noreferrer"><b>公路客運 · 國光 1819</b><span>桃園機場往台北的官方班次及票價入口</span></a>
+        <a href="https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/timetable-A12" target="_blank" rel="noreferrer"><b>桃園機場捷運</b><span>A12 第一航廈往台北首班車時間</span></a>
         <a href="https://web.metro.taipei/pages2026/WebStation/109" target="_blank" rel="noreferrer"><b>台北捷運</b><span>小巨蛋站官方資料</span></a>
         <a href="https://tixcraft.com/" target="_blank" rel="noreferrer"><b>拓元售票</b><span>Live Nation 頁面所列官方售票平台</span></a>
         <a href="https://www.instagram.com/fakesobertaipei/" target="_blank" rel="noreferrer"><b>Fake Sober Taipei</b><span>飯後輕酌首選的官方社交頁</span></a>
@@ -742,6 +810,7 @@
   <nav class="app-tabs" aria-label="手機 App 主要欄目">
     <a href="#itinerary">行程</a>
     <a href="#flight-check">航班</a>
+    <a href="#airport-transfer">交通</a>
     <a href="#restaurants" aria-current="true">餐廳</a>
     <a href="#trip-map">地圖</a>
     <a href="#tasks">待辦</a>
@@ -773,7 +842,7 @@
   <script>
     (() => {
       "use strict";
-      const DATA_URL = "./trip-data.json?v=20";
+      const DATA_URL = "./trip-data.json?v=21";
       const STORAGE_KEY = "taipei-lany-trip-2026-state-v1";
       const WALLET_DB = "taipei-lany-offline-wallet-v1";
       const builtInDocuments = new Set(["flight", "hotel", "map"]);
@@ -990,6 +1059,18 @@
               const index = data.taskItems.findIndex(task => task.id === id);
               if (index >= 0 && publishedTasks.has(id)) data.taskItems[index] = publishedTasks.get(id);
             });
+            ["night-transfer"].forEach(id => {
+              const index = data.taskItems.findIndex(task => task.id === id);
+              if (index >= 0 && publishedTasks.has(id)) data.taskItems[index] = publishedTasks.get(id);
+            });
+            const localArrivalDay = data.days.find(day => day.day === "9/26");
+            const publishedArrivalDay = published.days.find(day => day.day === "9/26");
+            if (localArrivalDay && publishedArrivalDay) {
+              const freshTransfer = publishedArrivalDay.items.find(item => item[1] === "深夜前往天閣酒店台北復興");
+              const transferIndex = localArrivalDay.items.findIndex(item => item[1] === "深夜前往天閣酒店台北復興");
+              if (freshTransfer && transferIndex >= 0) localArrivalDay.items[transferIndex] = freshTransfer;
+            }
+            data.revision = Math.max(Number(data.revision || 0), Number(published.revision || 0));
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           }
           state=data; $("notes").value=state.notes; renderTasks(); renderDays();
