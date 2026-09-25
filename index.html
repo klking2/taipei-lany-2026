@@ -668,7 +668,7 @@
   <script>
     (() => {
       "use strict";
-      const DATA_URL = "./trip-data.json";
+      const DATA_URL = "./trip-data.json?v=19";
       const STORAGE_KEY = "taipei-lany-trip-2026-state-v1";
       const WALLET_DB = "taipei-lany-offline-wallet-v1";
       const builtInDocuments = new Set(["flight", "hotel", "map"]);
@@ -868,10 +868,23 @@
           let data = null;
           const saved = localStorage.getItem(STORAGE_KEY);
           if (saved) data = JSON.parse(saved);
-          if (!data) {
+          let published = null;
+          try {
             const response=await fetch(DATA_URL,{cache:"no-store"});
-            data=await response.json();
-            if(!response.ok) throw new Error(data.error||"載入失敗");
+            published=await response.json();
+            if(!response.ok) throw new Error(published.error||"載入失敗");
+          } catch (error) {
+            if (!data) throw error;
+          }
+          if (!data) data = published;
+          if (data && published) {
+            const completedByOwner = ["exchange-twd"];
+            const publishedTasks = new Map(published.taskItems.map(task => [task.id, task]));
+            completedByOwner.forEach(id => {
+              data.taskChecks[id] = true;
+              const index = data.taskItems.findIndex(task => task.id === id);
+              if (index >= 0 && publishedTasks.has(id)) data.taskItems[index] = publishedTasks.get(id);
+            });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           }
           state=data; $("notes").value=state.notes; renderTasks(); renderDays();
