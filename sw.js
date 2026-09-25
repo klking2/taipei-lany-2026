@@ -1,4 +1,4 @@
-const CACHE = "taipei-lany-2026-v4";
+const CACHE = "taipei-lany-2026-v5";
 const APP_SHELL = [
   "./",
   "./index.html",

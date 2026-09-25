@@ -47,6 +47,19 @@
     .install-help.show { display:block; }
     .quick-nav { margin-bottom:18px; }
     .quick-nav a { min-height:38px; padding:0 12px; font-size:14px; }
+    .flight-check { margin:0 0 18px; padding:18px; border-color:#f0d89f; background:linear-gradient(145deg,#fffdf7,#fff8e8); }
+    .flight-check-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+    .flight-check-head h2 { margin:0 0 4px; }
+    .flight-check-head p { margin:0; color:#745f38; }
+    .flight-check-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+    .flight-check-card { padding:15px; border:1px solid rgba(184,137,52,.22); border-radius:16px; background:rgba(255,255,255,.78); }
+    .flight-check-card b,.flight-check-card span { display:block; }
+    .flight-check-card b { font-size:18px; }
+    .flight-check-card span { margin-top:4px; color:#725f3e; }
+    .flight-check-card .flight-warning { color:#a2512f; font-weight:850; }
+    .flight-check-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .flight-check-links a { min-height:40px; display:inline-flex; align-items:center; padding:0 12px; border-radius:12px; background:#fff; color:#775b25; text-decoration:none; font-weight:850; }
+    .app-tabs { display:none; }
     .board { display:grid; grid-template-columns:1.05fr 1.25fr .9fr; gap:16px; align-items:stretch; }
     .panel { background:rgba(255,255,255,.9); border:1px solid rgba(218,228,244,.92); border-radius:var(--radius); box-shadow:var(--shadow); }
     .profile-card,.hero-card,.alert-card { padding:24px; }
@@ -233,7 +246,7 @@
     }
     @media (max-width:650px) {
       body { font-size:17px; }
-      .shell { width:min(100% - 18px,1220px); padding-top:12px; }
+      .shell { width:min(100% - 18px,1220px); padding:12px 0 108px; }
       .topbar,.section-head,.system-bar { align-items:stretch; flex-direction:column; }
       .trip-switch { width:100%; }
       .trip-switch a { flex:1; }
@@ -242,6 +255,8 @@
       .day-nav { grid-template-columns:1fr 1fr; }
       .nightlife-grid { grid-template-columns:1fr; }
       .restaurant-grid { grid-template-columns:1fr; }
+      .flight-check-grid { grid-template-columns:1fr; }
+      .flight-check-head { flex-direction:column; }
       .vip-grid { grid-template-columns:1fr; }
       .route-board,.offline-pack { grid-template-columns:1fr; }
       .document-grid { grid-template-columns:1fr; }
@@ -252,11 +267,14 @@
       .stop { grid-template-columns:72px 12px 1fr; }
       .kind { grid-column:3; justify-self:start; }
       .edit-item { grid-template-columns:1fr; padding:12px; border:1px solid var(--line); border-radius:14px; }
+      .app-tabs { position:fixed; z-index:30; left:9px; right:9px; bottom:max(8px,env(safe-area-inset-bottom)); display:grid; grid-template-columns:repeat(5,1fr); gap:4px; padding:7px; border:1px solid rgba(207,217,237,.95); border-radius:18px; background:rgba(255,255,255,.96); box-shadow:0 16px 40px rgba(27,43,78,.22); backdrop-filter:blur(14px); }
+      .app-tabs a { min-width:0; padding:8px 3px; border-radius:12px; color:#52617f; text-align:center; text-decoration:none; font-size:12px; font-weight:900; }
+      .app-tabs a[aria-current="true"] { color:#fff; background:var(--blue); }
     }
     @media print {
       body { background:#fff; }
       .shell { width:100%; padding:0; }
-      .top-actions,.trip-switch,.system-bar button,.quick-nav,.toolbar,.button,.dialog,.toast { display:none!important; }
+      .top-actions,.trip-switch,.system-bar button,.quick-nav,.app-tabs,.toolbar,.button,.dialog,.toast { display:none!important; }
       .panel { box-shadow:none; break-inside:avoid; }
       .map-frame { min-height:360px; }
     }
@@ -286,6 +304,18 @@
     <nav class="quick-nav" aria-label="快速前往">
       <a href="#tasks">待辦</a><a href="#offline-wallet">離線證件包</a><a href="#vip-guide">VIP 入場</a><a href="#itinerary">逐日行程</a><a href="#restaurants">酒店附近餐廳</a><a href="#nightlife">飯後輕酌</a><a href="#trip-map">線上／離線地圖</a><a href="#trip-notes">備註</a><a href="#sources">官方資料</a>
     </nav>
+
+    <section class="flight-check panel" id="flight-check" aria-label="航班即時核對">
+      <div class="flight-check-head">
+        <div><p class="eyebrow">Live flight check · 9/25 18:21 HKT</p><h2>航班時間核對</h2><p>已把你的行程資料與航空公司班表及兩地機場官方頁逐項比對。</p></div>
+        <span class="chip warn">HB710 抵達時間有 30 分鐘差異</span>
+      </div>
+      <div class="flight-check-grid">
+        <article class="flight-check-card"><b>去程 HB710 · 今晚</b><span>香港機場官方：23:55 · HKG T2 · 報到行 Q；閘口及狀態尚未公布。</span><span class="flight-warning">你的通知／App 寫 01:55 抵達；桃園機場暫列 01:25。出發時間正常，抵達時間需在登機前再看一次。</span></article>
+        <article class="flight-check-card"><b>回程 HB707 · 9/27</b><span>現行班表：23:45 · TPE T1 → 9/28 01:50 · HKG T1。</span><span>與你已確認的回程資料一致；因尚未到出發日，閘口及即時狀態未公布。</span></article>
+      </div>
+      <div class="flight-check-links"><a href="https://www.hongkongairport.com/en/flights/departures/passenger.page" target="_blank" rel="noreferrer">香港機場即時離境</a><a href="https://web.taoyuan-airport.com/flight_arrival" target="_blank" rel="noreferrer">桃園機場抵達</a><a href="https://www.greaterbay-airlines.com/hk/en/book/flying-with-us/flight-schedule.html" target="_blank" rel="noreferrer">大灣區航空班表</a></div>
+    </section>
 
     <section class="board" aria-label="台北 LANY 旅程總覽">
       <article class="profile-card panel">
@@ -357,7 +387,7 @@
         <article class="document-card ready" data-document="flight">
           <div class="document-icon" aria-hidden="true">飛</div>
           <h3>航班</h3>
-          <p class="document-description">HB710 去程及 HB707 回程時間已內置；亦可加入航空公司截圖。</p>
+          <p class="document-description">HB710 去程及 HB707 回程時間已內置；頁面亦有機場官方即時核對。</p>
           <span class="document-status">基本資料已離線</span>
           <div class="document-actions">
             <button class="button document-open" type="button" data-open-document="flight">開啟航班</button>
@@ -438,8 +468,8 @@
 
     <section class="section panel" id="restaurants">
       <div class="section-head">
-        <div><p class="eyebrow">Eat near the hotel</p><h2>天閣台北復興 · 餐廳選擇</h2><p>以酒店復興北路 147 號為起點。步行及車程屬約數；真正出發前按 Google Maps 即時路況決定。</p></div>
-        <span class="chip done">火鍋首選：老撈</span>
+        <div><p class="eyebrow">Eat near the hotel</p><h2>天閣台北復興 · 16 間餐廳選擇</h2><p>以酒店復興北路 147 號為起點。由快速午餐到燒肉、台菜、火鍋及深夜宵夜；步行及車程屬約數，出發前按 Google Maps 即時路況決定。</p></div>
+        <span class="chip done">App 獨立餐廳欄目</span>
       </div>
       <div class="restaurant-grid">
         <article class="restaurant-card featured">
@@ -498,8 +528,64 @@
           <p>可同時解決晚餐與輕酌，氣氛比普通居酒屋舒服；座位有限，建議先訂位。</p>
           <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E6%99%82%E5%85%89%E5%B0%8F%E9%85%92%E9%A4%A8+Bistro+%E6%95%A6%E5%8C%96%E5%8C%97%E8%B7120%E5%B7%B716%E8%99%9F" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://www.opentable.com.tw/restaurant/profile/178829" target="_blank" rel="noreferrer">查看訂位</a></div>
         </article>
+        <article class="restaurant-card featured">
+          <div><span class="chip done">I · 高級燒肉</span><span class="chip">約步行 6–8 分鐘</span></div>
+          <h3>老乾杯 慶城店</h3>
+          <p class="restaurant-meta">和牛燒肉 · 桌邊服務 · 可訂位 · 高預算</p>
+          <p>想在酒店附近吃一餐較完整的燒肉可選這間；訂位可能要求信用卡擔保，確認取消及 no-show 條款才提交。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E8%80%81%E4%B9%BE%E6%9D%AF+%E6%85%B6%E5%9F%8E%E5%BA%97" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://www.opentable.com.tw/restaurant/profile/186332" target="_blank" rel="noreferrer">查看訂位</a></div>
+        </article>
+        <article class="restaurant-card">
+          <div><span class="chip">J · 印度菜</span><span class="chip">約步行 8–10 分鐘</span></div>
+          <h3>馬友友印度廚房 · 民生東路店</h3>
+          <p class="restaurant-meta">南北印度菜 · 咖喱 · 烤肉 · 素食選擇</p>
+          <p>連續吃中式後想轉口味可以選這間；肉類及素食選擇齊，同行者口味不同亦較易點餐。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%A6%AC%E5%8F%8B%E5%8F%8B%E5%8D%B0%E5%BA%A6%E5%BB%9A%E6%88%BF+%E6%B0%91%E7%94%9F%E6%9D%B1%E8%B7%AF%E5%BA%97" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://www.mik3taiwan.com/zh/locations-hours" target="_blank" rel="noreferrer">官方分店資料</a></div>
+        </article>
+        <article class="restaurant-card featured">
+          <div><span class="chip done">K · 台灣雞料理</span><span class="chip">約的士 8–10 分鐘</span></div>
+          <h3>雞家莊 · 長春路</h3>
+          <p class="restaurant-meta">三味雞 · 招牌豆腐 · 蝦仁卷 · 雞蛋布丁</p>
+          <p>老派台灣聚餐味道，比只吃一碗麵更完整；兩人可選小份，三至四人較能試多款招牌菜。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%9B%9E%E5%AE%B6%E8%8E%8A+%E9%95%B7%E6%98%A5%E8%B7%AF55%E8%99%9F" target="_blank" rel="noreferrer">Google Maps／導航</a></div>
+        </article>
+        <article class="restaurant-card featured">
+          <div><span class="chip done">L · 米其林必比登</span><span class="chip">約的士 8–12 分鐘</span></div>
+          <h3>阿城鵝肉 · 中山</h3>
+          <p class="restaurant-meta">煙燻鵝 · 白切鵝 · 滷水小菜 · 台灣味</p>
+          <p>招牌是煙燻或白切鵝肉，適合想吃香港較少見的台式鵝肉；繁忙時間要預留等位。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%98%BF%E5%9F%8E%E9%B5%9D%E8%82%89+%E4%B8%AD%E5%B1%B1+%E5%90%89%E6%9E%97%E8%B7%AF162%E8%99%9F" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://guide.michelin.com/tw/zh_TW/taipei-region/taipei/restaurant/a-cheng-goose-zhongshan" target="_blank" rel="noreferrer">MICHELIN 資料</a></div>
+        </article>
+        <article class="restaurant-card">
+          <div><span class="chip">M · 快速地道午餐</span><span class="chip">約的士 8–10 分鐘</span></div>
+          <h3>富霸王豬腳</h3>
+          <p class="restaurant-meta">滷豬腳 · 腿扣 · 滷肉飯 · 平日午餐</p>
+          <p>適合用較短時間吃一餐台灣本地味；常見排隊，星期日及星期一通常休息，當日再核對營業狀況。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%AF%8C%E9%9C%B8%E7%8E%8B%E8%B1%AC%E8%85%B3+%E5%8D%97%E4%BA%AC%E6%9D%B1%E8%B7%AF%E4%BA%8C%E6%AE%B5115%E5%B7%B720%E8%99%9F" target="_blank" rel="noreferrer">Google Maps／導航</a></div>
+        </article>
+        <article class="restaurant-card">
+          <div><span class="chip">N · 多人川菜</span><span class="chip">約的士 10–15 分鐘</span></div>
+          <h3>驥園川菜餐廳</h3>
+          <p class="restaurant-meta">砂鍋雞湯 · 川菜 · 三至四人以上較合適</p>
+          <p>巨大砂鍋雞湯是主角，份量較大；若只有兩人未必最划算，和朋友同行則值得預約。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%A9%A5%E5%9C%92%E5%B7%9D%E8%8F%9C%E9%A4%90%E5%BB%B3+%E6%95%A6%E5%8C%96%E5%8D%97%E8%B7%AF%E4%B8%80%E6%AE%B5324%E8%99%9F" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://www.taiwan.net.tw/m1.aspx?page=29&amp;sNo=0027001" target="_blank" rel="noreferrer">旅遊署資料</a></div>
+        </article>
+        <article class="restaurant-card">
+          <div><span class="chip">O · 可訂位麻辣鍋</span><span class="chip">約的士 10–15 分鐘</span></div>
+          <h3>青花驕麻辣鍋 · 光復南店</h3>
+          <p class="restaurant-meta">青花椒麻辣鍋 · 晚收 · 可網上訂位</p>
+          <p>若想要流程穩定、容易訂位的火鍋後備，這間比現場排隊老店更好安排；適合較晚吃晚餐。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E9%9D%92%E8%8A%B1%E9%A9%95%E9%BA%BB%E8%BE%A3%E9%8D%8B+%E5%8F%B0%E5%8C%97%E5%85%89%E5%BE%A9%E5%8D%97%E5%BA%97" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://www.chinhuajiao.com/stores.php" target="_blank" rel="noreferrer">官方分店／訂位</a></div>
+        </article>
+        <article class="restaurant-card featured">
+          <div><span class="chip done">P · 深夜宵夜</span><span class="chip">約的士 10–15 分鐘</span></div>
+          <h3>小品雅廚</h3>
+          <p class="restaurant-meta">清粥小菜 · 台式熱炒 · 約 18:00–05:00 · 現金</p>
+          <p>深夜仍想吃正經台灣菜時最好用，粥配多款小菜可自己控制份量；不是靠預約，較適合臨時去。</p>
+          <div class="restaurant-actions"><a href="https://www.google.com/maps/search/?api=1&amp;query=%E5%B0%8F%E5%93%81%E9%9B%85%E5%BB%9A+%E4%B8%AD%E5%8E%9F%E8%A1%97130%E8%99%9F" target="_blank" rel="noreferrer">Google Maps／導航</a><a href="https://guide.michelin.com/tw/zh_TW/taipei-region/taipei/restaurant/xiao-ping-kitchen" target="_blank" rel="noreferrer">MICHELIN 資料</a></div>
+        </article>
       </div>
-      <p class="restaurant-note"><strong>最快決定：</strong>火鍋選老撈；台灣菜選茂園；只想快速吃選慶城海南雞飯；海鮮選上引水產；想晚餐後直接飲酒選時光小酒館。營業時間、座位與候位狀況出發前再按地圖核對。</p>
+      <p class="restaurant-note"><strong>最快決定：</strong>火鍋選老撈／青花驕；台灣菜選茂園；燒肉選老乾杯；地道鵝肉選阿城；多人聚餐選雞家莊／驥園；深夜宵夜選小品雅廚；快速吃選慶城海南雞飯／富霸王。營業時間、座位與候位狀況出發前再按地圖核對。</p>
     </section>
 
     <section class="section panel" id="nightlife">
@@ -574,6 +660,14 @@
             <article><b>上引水產</b><span>魚市場、壽司、炭燒及海鮮火鍋</span></article>
             <article><b>鄒記食舖</b><span>高預算預約制私房菜</span></article>
             <article><b>時光小酒館 Bistro</b><span>串燒、調酒及深夜選擇</span></article>
+            <article><b>老乾杯 慶城店</b><span>酒店附近高級和牛燒肉</span></article>
+            <article><b>馬友友印度廚房</b><span>南北印度菜、烤肉及素食選擇</span></article>
+            <article><b>雞家莊 長春路</b><span>三味雞及老派台灣聚餐菜</span></article>
+            <article><b>阿城鵝肉 中山</b><span>煙燻／白切鵝肉 · 必比登</span></article>
+            <article><b>富霸王豬腳</b><span>快速地道午餐 · 留意休息日</span></article>
+            <article><b>驥園川菜餐廳</b><span>砂鍋雞湯 · 多人聚餐</span></article>
+            <article><b>青花驕 光復南店</b><span>可網上訂位的青花椒麻辣鍋</span></article>
+            <article><b>小品雅廚</b><span>深夜清粥小菜 · 現金</span></article>
           </div>
           <div class="map-links">
             <a href="https://www.google.com/maps/d/u/1/edit?mid=1qS73tEk4fXy4ET0t5d-9Zf0CyJlZv5Q" target="_blank" rel="noreferrer">在 Google My Maps 編輯</a>
@@ -627,8 +721,11 @@
     </section>
 
     <section class="section panel" id="sources">
-      <div class="section-head"><div><p class="eyebrow">Official references</p><h2>已核對資料來源</h2><p>航班以你提供的最新截圖為準；以下為官方行程資料。</p></div></div>
+      <div class="section-head"><div><p class="eyebrow">Official references</p><h2>已核對資料來源</h2><p>航班同時參考你的航空公司更改通知、航空公司班表及兩地機場即時頁；遇到差異會明確標示。</p></div></div>
       <div class="source-grid">
+        <a href="https://www.hongkongairport.com/en/flights/departures/passenger.page" target="_blank" rel="noreferrer"><b>香港國際機場 · 即時離境</b><span>HB710 出發時間、客運大樓、報到行及即時狀態</span></a>
+        <a href="https://web.taoyuan-airport.com/flight_arrival" target="_blank" rel="noreferrer"><b>桃園國際機場 · 客機抵達</b><span>HB710 抵達航廈及最新預計時間</span></a>
+        <a href="https://www.greaterbay-airlines.com/hk/en/book/flying-with-us/flight-schedule.html" target="_blank" rel="noreferrer"><b>大灣區航空 · 班表</b><span>HB710／HB707 現行定期班表</span></a>
         <a href="https://www.livenation.com.tw/lany-tpe26" target="_blank" rel="noreferrer"><b>Live Nation Taiwan · VIP 入場辦法</b><span>19:30 開演、VIP 報到、整隊、周邊及安檢規定</span></a>
         <a href="https://www.arena.taipei/Content_List.aspx?n=58355307EB94AD7B" target="_blank" rel="noreferrer"><b>台北小巨蛋</b><span>官方地址及場館資料</span></a>
         <a href="https://fh.tango-hotels.com/_en/" target="_blank" rel="noreferrer"><b>The Tango Taipei Fuxing</b><span>酒店地址、電話及交通</span></a>
@@ -641,6 +738,14 @@
       </div>
     </section>
   </main>
+
+  <nav class="app-tabs" aria-label="手機 App 主要欄目">
+    <a href="#itinerary">行程</a>
+    <a href="#flight-check">航班</a>
+    <a href="#restaurants" aria-current="true">餐廳</a>
+    <a href="#trip-map">地圖</a>
+    <a href="#tasks">待辦</a>
+  </nav>
 
   <dialog id="day-dialog">
     <form method="dialog" id="day-form">
@@ -668,7 +773,7 @@
   <script>
     (() => {
       "use strict";
-      const DATA_URL = "./trip-data.json?v=19";
+      const DATA_URL = "./trip-data.json?v=20";
       const STORAGE_KEY = "taipei-lany-trip-2026-state-v1";
       const WALLET_DB = "taipei-lany-offline-wallet-v1";
       const builtInDocuments = new Set(["flight", "hotel", "map"]);
@@ -749,7 +854,7 @@
       function showBuiltInDocument(id) {
         const copy = {
           permit:`<div class="viewer-copy"><h3>尚未加入台證</h3><p>關閉視窗後按「加入／更換檔案」，從手機「檔案」或「相片」選擇台證。檔案只保存於目前手機。</p></div>`,
-          flight:`<div class="viewer-copy"><h3>航班資料</h3><dl><dt>去程</dt><dd>HB710 · 9/25 23:55 · 香港 T2 → 桃園 T1</dd><dt>抵達</dt><dd>9/26 01:55 · 桃園機場 T1</dd><dt>回程</dt><dd>HB707 · 9/27 23:45 · 桃園 T1 → 香港 T1</dd><dt>抵港</dt><dd>9/28 01:50 · 香港 T1</dd></dl></div>`,
+          flight:`<div class="viewer-copy"><h3>航班資料</h3><dl><dt>去程</dt><dd>HB710 · 9/25 23:55 · 香港 T2 → 桃園 T1</dd><dt>抵達</dt><dd>航空公司通知 01:55；桃園機場暫列 01:25，登機前再核對</dd><dt>回程</dt><dd>HB707 · 9/27 23:45 · 桃園 T1 → 香港 T1</dd><dt>抵港</dt><dd>9/28 01:50 · 香港 T1</dd></dl></div>`,
           hotel:`<div class="viewer-copy"><h3>天閣酒店 台北復興</h3><dl><dt>英文</dt><dd>The Tango Taipei Fuhsing</dd><dt>地址</dt><dd>台北市松山區復興北路 147 號</dd><dt>入住</dt><dd>住宿由 9/25 晚開始；9/26 凌晨抵達後直接入住休息</dd><dt>交通</dt><dd>南京復興站附近</dd></dl></div>`,
           ticket:`<div class="viewer-copy"><h3>尚未加入票券檔案</h3><p>請加入演唱會票券；如屬 VIP Upgrade，演唱會票券和 Upgrade 票券都要保存。已內置時間：14:00 VIP 報到／周邊，按票種 15:50 或 16:50 整隊，19:30 開演。</p></div>`
         };
