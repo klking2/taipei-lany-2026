@@ -146,6 +146,34 @@
     .offline-pack article { padding:14px; border-radius:16px; background:#f3f6ff; }
     .offline-pack b,.offline-pack span { display:block; }
     .offline-pack span { margin-top:3px; color:var(--muted); font-size:14px; }
+    .wallet-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+    .wallet-meter { min-width:150px; padding:12px 14px; border-radius:16px; background:var(--blue-soft); color:#4d63bd; text-align:center; }
+    .wallet-meter strong { display:block; font-size:26px; line-height:1.1; }
+    .wallet-meter span { font-size:13px; font-weight:800; }
+    .privacy-banner { margin:0 0 16px; padding:14px 16px; border:1px solid #ccefe2; border-radius:16px; background:#effbf7; color:#276d5a; }
+    .document-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+    .document-card { display:flex; min-width:0; flex-direction:column; gap:10px; padding:16px; border:1px solid var(--line); border-radius:19px; background:#fbfcff; }
+    .document-card.ready { border-color:#bfe7d9; background:#f4fcf9; }
+    .document-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:14px; background:var(--blue-soft); color:#4d63bd; font-size:20px; font-weight:950; }
+    .document-card.ready .document-icon { color:var(--green); background:var(--mint); }
+    .document-card h3 { margin:0; font-size:18px; }
+    .document-card p { margin:0; color:var(--muted); font-size:14px; }
+    .document-status { display:flex; align-items:center; gap:7px; color:#98651d; font-size:13px; font-weight:900; }
+    .document-status:before { content:""; width:8px; height:8px; flex:0 0 auto; border-radius:50%; background:var(--amber); }
+    .document-card.ready .document-status { color:var(--green); }
+    .document-card.ready .document-status:before { background:#26a47a; }
+    .document-actions { display:grid; gap:7px; margin-top:auto; }
+    .document-actions .button { width:100%; min-height:44px; }
+    .document-actions input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+    .local-only { color:#7a5a25!important; }
+    .viewer { width:min(880px,calc(100% - 18px)); }
+    .viewer-frame { width:100%; min-height:65vh; border:1px solid var(--line); border-radius:14px; background:#f3f5f8; }
+    .viewer-image { display:block; width:auto; max-width:100%; max-height:65vh; margin:auto; border-radius:14px; }
+    .viewer-copy { padding:18px; border-radius:16px; background:#f7f9ff; }
+    .viewer-copy h3 { margin:0 0 12px; }
+    .viewer-copy dl { display:grid; grid-template-columns:120px 1fr; gap:8px 12px; margin:0; }
+    .viewer-copy dt { color:var(--muted); font-weight:800; }
+    .viewer-copy dd { margin:0; font-weight:800; }
     .nightlife-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
     .nightlife-card { position:relative; padding:18px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#fff 0%,#f8f9ff 100%); overflow:hidden; }
     .nightlife-card::before { content:""; position:absolute; inset:0 auto 0 0; width:5px; background:#cbd4ea; }
@@ -192,6 +220,7 @@
       .map-grid,.timeline-shell { grid-template-columns:1fr; }
       .day-nav { grid-template-columns:repeat(4,1fr); }
       .source-grid { grid-template-columns:1fr; }
+      .document-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
     @media (max-width:650px) {
       body { font-size:17px; }
@@ -205,6 +234,10 @@
       .nightlife-grid { grid-template-columns:1fr; }
       .vip-grid { grid-template-columns:1fr; }
       .route-board,.offline-pack { grid-template-columns:1fr; }
+      .document-grid { grid-template-columns:1fr; }
+      .wallet-head { flex-direction:column; }
+      .wallet-meter { width:100%; }
+      .viewer-copy dl { grid-template-columns:1fr; gap:3px; }
       .section,.profile-card,.hero-card,.alert-card { padding:18px; }
       .stop { grid-template-columns:72px 12px 1fr; }
       .kind { grid-column:3; justify-self:start; }
@@ -241,7 +274,7 @@
       <button id="reload-system" type="button">重新載入</button>
     </div>
     <nav class="quick-nav" aria-label="快速前往">
-      <a href="#tasks">待辦</a><a href="#vip-guide">VIP 入場</a><a href="#itinerary">逐日行程</a><a href="#nightlife">飯後輕酌</a><a href="#trip-map">線上／離線地圖</a><a href="#trip-notes">備註</a><a href="#sources">官方資料</a>
+      <a href="#tasks">待辦</a><a href="#offline-wallet">離線證件包</a><a href="#vip-guide">VIP 入場</a><a href="#itinerary">逐日行程</a><a href="#nightlife">飯後輕酌</a><a href="#trip-map">線上／離線地圖</a><a href="#trip-notes">備註</a><a href="#sources">官方資料</a>
     </nav>
 
     <section class="board" aria-label="台北 LANY 旅程總覽">
@@ -292,6 +325,66 @@
     <section class="section panel" id="tasks">
       <div class="section-head"><div><p class="eyebrow">Action queue</p><h2>出發前待辦</h2><p>打勾後會儲存在這部手機；離線亦可修改，清除瀏覽器資料前請不要刪除網站資料。</p></div></div>
       <div class="task-grid" id="task-grid"></div>
+    </section>
+
+    <section class="section panel" id="offline-wallet">
+      <div class="wallet-head section-head">
+        <div><p class="eyebrow">Offline travel wallet</p><h2>手機離線證件包</h2><p>五項逐一開啟。航班、酒店和路線已內置；台證與票券只存在這部手機，不會上傳公開網站。</p></div>
+        <div class="wallet-meter"><strong id="wallet-count">3／5</strong><span>項目可離線打開</span></div>
+      </div>
+      <p class="privacy-banner"><strong>私隱保護：</strong>台證及票券加入後會存入目前手機的瀏覽器資料庫。公開網址的其他訪客看不到你的檔案；若清除 Safari 網站資料，需要重新加入。</p>
+      <div class="document-grid">
+        <article class="document-card" data-document="permit">
+          <div class="document-icon" aria-hidden="true">證</div>
+          <h3>台證</h3>
+          <p class="document-description">加入台證 PDF 或相片後，可在飛行模式直接打開。</p>
+          <span class="document-status">尚未加入此手機</span>
+          <div class="document-actions">
+            <button class="button document-open" type="button" data-open-document="permit">開啟台證</button>
+            <label class="button primary">加入／更換檔案<input class="document-input" data-import-document="permit" type="file" accept="application/pdf,image/*"></label>
+          </div>
+        </article>
+        <article class="document-card ready" data-document="flight">
+          <div class="document-icon" aria-hidden="true">飛</div>
+          <h3>航班</h3>
+          <p class="document-description">HB710 去程及 HB707 回程時間已內置；亦可加入航空公司截圖。</p>
+          <span class="document-status">基本資料已離線</span>
+          <div class="document-actions">
+            <button class="button document-open" type="button" data-open-document="flight">開啟航班</button>
+            <label class="button primary">加入／更換截圖<input class="document-input" data-import-document="flight" type="file" accept="application/pdf,image/*"></label>
+          </div>
+        </article>
+        <article class="document-card ready" data-document="hotel">
+          <div class="document-icon" aria-hidden="true">住</div>
+          <h3>酒店</h3>
+          <p class="document-description">酒店中英文名、地址和凌晨入住安排已內置；可加入訂房確認。</p>
+          <span class="document-status">基本資料已離線</span>
+          <div class="document-actions">
+            <button class="button document-open" type="button" data-open-document="hotel">開啟酒店</button>
+            <label class="button primary">加入／更換確認<input class="document-input" data-import-document="hotel" type="file" accept="application/pdf,image/*"></label>
+          </div>
+        </article>
+        <article class="document-card" data-document="ticket">
+          <div class="document-icon" aria-hidden="true">票</div>
+          <h3>演唱會票券</h3>
+          <p class="document-description">加入演唱會票券及 VIP Upgrade 票券；兩張都要保存。</p>
+          <span class="document-status">尚未加入此手機</span>
+          <div class="document-actions">
+            <button class="button document-open" type="button" data-open-document="ticket">開啟票券</button>
+            <label class="button primary">加入／更換檔案<input class="document-input" data-import-document="ticket" type="file" accept="application/pdf,image/*"></label>
+          </div>
+        </article>
+        <article class="document-card ready" data-document="map">
+          <div class="document-icon" aria-hidden="true">圖</div>
+          <h3>台北離線路線</h3>
+          <p class="document-description">9/26 演唱會日及 9/27 舊城美食路線、地址和時間已下載。</p>
+          <span class="document-status">路線已離線</span>
+          <div class="document-actions">
+            <button class="button document-open" type="button" data-open-document="map">開啟離線路線</button>
+            <a class="button primary" href="https://www.google.com/maps/d/viewer?mid=1qS73tEk4fXy4ET0t5d-9Zf0CyJlZv5Q" target="_blank" rel="noreferrer">線上 My Maps</a>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section class="section panel" id="vip-guide">
@@ -481,6 +574,11 @@
       <div class="dialog-foot"><span style="color:var(--muted)">儲存到目前手機，離線可用。</span><button class="button primary" id="save-day" value="default" type="submit">儲存日期</button></div>
     </form>
   </dialog>
+  <dialog class="viewer" id="document-dialog">
+    <div class="dialog-head"><div><p class="eyebrow">Offline document</p><h2 id="document-title" style="margin:0">離線檔案</h2></div><button class="button" id="close-document" type="button">關閉</button></div>
+    <div class="dialog-body" id="document-viewer"></div>
+    <div class="dialog-foot"><span id="document-footnote" style="color:var(--muted)">檔案只存在目前手機。</span><button class="button primary" id="close-document-bottom" type="button">完成</button></div>
+  </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -488,9 +586,12 @@
       "use strict";
       const DATA_URL = "./trip-data.json";
       const STORAGE_KEY = "taipei-lany-trip-2026-state-v1";
+      const WALLET_DB = "taipei-lany-offline-wallet-v1";
+      const builtInDocuments = new Set(["flight", "hotel", "map"]);
+      const documentNames = {permit:"台證",flight:"航班",hotel:"酒店",ticket:"演唱會票券",map:"台北離線路線"};
       const kinds = {transport:"交通",hotel:"酒店",show:"演唱會",activity:"活動",food:"餐飲"};
       const $ = id => document.getElementById(id);
-      let state = null, currentDay = 0, saveTimer = null, noteTimer = null, installPrompt = null;
+      let state = null, currentDay = 0, saveTimer = null, noteTimer = null, installPrompt = null, activeDocumentUrl = null;
 
       function setSystem(mode, message) {
         $("system-bar").dataset.state = mode;
@@ -499,6 +600,110 @@
       function toast(message) {
         const el = $("toast"); el.textContent = message; el.classList.add("show");
         clearTimeout(el._timer); el._timer = setTimeout(() => el.classList.remove("show"), 2400);
+      }
+      function openWalletDB() {
+        return new Promise((resolve,reject) => {
+          const request = indexedDB.open(WALLET_DB, 1);
+          request.onupgradeneeded = () => {
+            if (!request.result.objectStoreNames.contains("files")) request.result.createObjectStore("files", {keyPath:"id"});
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error || new Error("無法開啟手機離線儲存"));
+        });
+      }
+      async function walletGet(id) {
+        const db = await openWalletDB();
+        return new Promise((resolve,reject) => {
+          const request = db.transaction("files","readonly").objectStore("files").get(id);
+          request.onsuccess = () => { db.close(); resolve(request.result || null); };
+          request.onerror = () => { db.close(); reject(request.error); };
+        });
+      }
+      async function walletPut(record) {
+        const db = await openWalletDB();
+        return new Promise((resolve,reject) => {
+          const transaction = db.transaction("files","readwrite");
+          transaction.objectStore("files").put(record);
+          transaction.oncomplete = () => { db.close(); resolve(); };
+          transaction.onerror = () => { db.close(); reject(transaction.error); };
+        });
+      }
+      async function refreshWallet() {
+        let ready = builtInDocuments.size;
+        for (const id of Object.keys(documentNames)) {
+          const card = document.querySelector(`[data-document="${id}"]`);
+          if (!card) continue;
+          let record = null;
+          try { record = await walletGet(id); } catch (_) {}
+          const baseReady = builtInDocuments.has(id);
+          const isReady = baseReady || Boolean(record);
+          card.classList.toggle("ready", isReady);
+          const status = card.querySelector(".document-status");
+          if (record) {
+            status.textContent = `已離線：${record.name}`;
+            if (!baseReady) ready += 1;
+          } else if (baseReady) {
+            status.textContent = id === "map" ? "路線已離線" : "基本資料已離線";
+          } else {
+            status.textContent = "尚未加入此手機";
+          }
+        }
+        $("wallet-count").textContent = `${ready}／5`;
+      }
+      async function importDocument(id,file) {
+        if (!file) return;
+        if (file.size > 25 * 1024 * 1024) return toast("檔案超過 25MB，請改用較小的 PDF 或相片");
+        try {
+          if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+          await walletPut({id,name:file.name,type:file.type || "application/octet-stream",size:file.size,blob:file,updatedAt:new Date().toISOString()});
+          await refreshWallet();
+          toast(`${documentNames[id]}已保存到這部手機`);
+        } catch (error) {
+          toast(`未能保存：${error.message || "手機儲存失敗"}`);
+        }
+      }
+      function showBuiltInDocument(id) {
+        const copy = {
+          permit:`<div class="viewer-copy"><h3>尚未加入台證</h3><p>關閉視窗後按「加入／更換檔案」，從手機「檔案」或「相片」選擇台證。檔案只保存於目前手機。</p></div>`,
+          flight:`<div class="viewer-copy"><h3>航班資料</h3><dl><dt>去程</dt><dd>HB710 · 9/25 23:55 · 香港 T2 → 桃園 T1</dd><dt>抵達</dt><dd>9/26 01:55 · 桃園機場 T1</dd><dt>回程</dt><dd>HB707 · 9/27 23:45 · 桃園 T1 → 香港 T1</dd><dt>抵港</dt><dd>9/28 01:50 · 香港 T1</dd></dl></div>`,
+          hotel:`<div class="viewer-copy"><h3>天閣酒店 台北復興</h3><dl><dt>英文</dt><dd>The Tango Taipei Fuhsing</dd><dt>地址</dt><dd>台北市松山區復興北路 147 號</dd><dt>入住</dt><dd>住宿由 9/25 晚開始；9/26 凌晨抵達後直接入住休息</dd><dt>交通</dt><dd>南京復興站附近</dd></dl></div>`,
+          ticket:`<div class="viewer-copy"><h3>尚未加入票券檔案</h3><p>請加入演唱會票券；如屬 VIP Upgrade，演唱會票券和 Upgrade 票券都要保存。已內置時間：14:00 VIP 報到／周邊，按票種 15:50 或 16:50 整隊，19:30 開演。</p></div>`
+        };
+        $("document-viewer").innerHTML = copy[id] || "";
+      }
+      async function openDocument(id) {
+        if (id === "map") {
+          showMapMode("offline");
+          $("trip-map").scrollIntoView({behavior:"smooth",block:"start"});
+          return;
+        }
+        $("document-title").textContent = documentNames[id];
+        $("document-footnote").textContent = "加入的檔案只存在目前手機，不會上傳。";
+        try {
+          const record = await walletGet(id);
+          if (!record) {
+            showBuiltInDocument(id);
+          } else {
+            if (activeDocumentUrl) URL.revokeObjectURL(activeDocumentUrl);
+            activeDocumentUrl = URL.createObjectURL(record.blob);
+            if (record.type.startsWith("image/")) {
+              const image = document.createElement("img"); image.className="viewer-image"; image.alt=record.name; image.src=activeDocumentUrl;
+              $("document-viewer").replaceChildren(image);
+            } else {
+              const frame = document.createElement("iframe"); frame.className="viewer-frame"; frame.title=record.name; frame.src=activeDocumentUrl;
+              $("document-viewer").replaceChildren(frame);
+            }
+            $("document-footnote").textContent = `${record.name} · 已保存在目前手機`;
+          }
+          $("document-dialog").showModal();
+        } catch (error) {
+          toast(`未能開啟：${error.message || "檔案讀取失敗"}`);
+        }
+      }
+      function closeDocument() {
+        $("document-dialog").close();
+        if (activeDocumentUrl) { URL.revokeObjectURL(activeDocumentUrl); activeDocumentUrl=null; }
+        $("document-viewer").textContent="";
       }
       function payload() {
         return { revision:state.revision, taskChecks:state.taskChecks, taskItems:state.taskItems, days:state.days, notes:state.notes };
@@ -623,6 +828,10 @@
       $("show-online-map").addEventListener("click",()=>showMapMode("online"));
       $("show-offline-map").addEventListener("click",()=>showMapMode("offline"));
       $("install-app").addEventListener("click",installApp);
+      document.querySelectorAll("[data-import-document]").forEach(input=>input.addEventListener("change",event=>{ importDocument(input.dataset.importDocument,event.target.files[0]); event.target.value=""; }));
+      document.querySelectorAll("[data-open-document]").forEach(button=>button.addEventListener("click",()=>openDocument(button.dataset.openDocument)));
+      $("close-document").addEventListener("click",closeDocument);
+      $("close-document-bottom").addEventListener("click",closeDocument);
       window.addEventListener("online",updateConnection);
       window.addEventListener("offline",updateConnection);
       window.addEventListener("beforeinstallprompt",event=>{ event.preventDefault(); installPrompt=event; });
@@ -630,6 +839,7 @@
       window.addEventListener("beforeprint",()=>{if(state)renderDays();});
       if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
       updateConnection();
+      refreshWallet();
       load();
     })();
   </script>
